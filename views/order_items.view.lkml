@@ -17,6 +17,7 @@ view: order_items {
       date,
       week,
       month,
+      month_name,
       quarter,
       year
     ]
@@ -65,6 +66,22 @@ view: order_items {
   dimension: sale_price {
     type: number
     sql: ${TABLE}."SALE_PRICE" ;;
+    # value_format_name: id
+  }
+
+  dimension: sale_price_value_format_id_type {
+    type: string
+    # sql: ${TABLE}."SALE_PRICE"*1234567898765000;;
+    sql: CONCAT('\'',${TABLE}."SALE_PRICE"*12345678987650000::VARCHAR);;
+    # sql: CONCAT('\'',${TABLE}."SALE_PRICE"*12345678987650000);;
+    value_format: "id"
+  }
+
+  dimension: sale_price_value_format_id_type_2 {
+    type: string
+    sql: ${sale_price_value_format_id_type};;
+    # sql: CONCAT('\'',${TABLE}."SALE_PRICE"*12345678987650000);;
+    value_format_name: id
   }
 
   dimension_group: shipped {
@@ -81,9 +98,65 @@ view: order_items {
     sql: ${TABLE}."SHIPPED_AT" ;;
   }
 
+  dimension_group: shipped_datatype_datetime {
+    type: time
+    datatype: datetime
+    timeframes: [
+      raw,
+      time,
+      date,
+      week,
+      month,
+      quarter,
+      year
+    ]
+    sql: ${TABLE}."SHIPPED_AT" ;;
+  }
+
+  dimension_group: shipped_datatype_timestamp {
+    type: time
+    datatype: timestamp
+    timeframes: [
+      raw,
+      time,
+      date,
+      week,
+      month,
+      quarter,
+      year
+    ]
+    sql: ${TABLE}."SHIPPED_AT" ;;
+  }
+
   dimension: status {
     type: string
     sql: ${TABLE}."STATUS" ;;
+#     html: <div class="btn-group btn-group-toggle" data-toggle="buttons">
+# <label class="btn btn-secondary active">
+# <input type="radio" name="options" id="option1" autocomplete="off" checked>
+# <a class="btn btn-lg btn-light" href="https://dcl.dev.looker.com/dashboards/112">
+# <i class="fa fa-globe fa-2x"></i>
+# <br />
+# {{value}}
+# </a>
+# </label>
+# <label class="btn btn-secondary">
+# <input type="radio" name="options" id="option2" autocomplete="off">
+# <a class="btn btn-lg btn-light" href="https://dcl.dev.looker.com/dashboards/113">
+# <i class="fa fa-pencil fa-2x" aria-hidden="true"></i>
+# <br />
+# Usage
+# </a>
+# </label>
+# <label class="btn btn-secondary">
+# <input type="radio" name="options" id="option3" autocomplete="off">
+# <a class="btn btn-lg btn-light" href="https://dcl.dev.looker.com/dashboards/114">
+# <i class="fa fa-check-square-o fa-2x" aria-hidden="true"></i>
+# <br />
+# Performance
+# </a>
+# </label>
+# </div> ;;
   }
 
   dimension: user_id {
@@ -92,9 +165,58 @@ view: order_items {
     sql: ${TABLE}."USER_ID" ;;
   }
 
+  measure: test {
+    type: number
+    sql: ${total_sale_price} * (case when ${rank_derived_table.rank} > 8400 then 0 else 1 end) ;;
+  }
+
+  measure: test_with_measure_rank {
+    type: number
+    sql: ${total_sale_price} * (case when ${sum_rank} > 150 then 0 else 1 end) ;;
+  }
+
+
   measure: count {
     type: count
     drill_fields: [detail*]
+  }
+
+  measure: total_sale_price {
+    type: sum
+    sql: ${sale_price} ;;
+    html: {%if total_sale_price < 0 %}
+    {{value}}
+    {% else %}
+    {% endif %};;
+  }
+
+  measure: total_sale_price_2019 {
+    type: sum
+    sql: ${sale_price};;
+    filters: [created_year: "2019"]
+  }
+
+  measure: count_orders_2019 {
+    type: count
+    filters: [created_year: "2019"]
+  }
+
+  measure: average_order_price {
+    type: number
+    sql: 1.0*${total_sale_price}/nullif(${count},0) ;;
+    value_format_name: usd_0
+  }
+
+  measure: average_order_price_2019 {
+    type: number
+    sql: 1.0*${total_sale_price_2019}/nullif(${count_orders_2019},0) ;;
+    value_format_name: usd_0
+  }
+
+
+  measure: sum_rank {
+    type: sum
+    sql:${rank_derived_table.rank} ;;
   }
 
   # ----- Sets of fields for drilling ------

@@ -14,6 +14,8 @@ explore: distribution_centers {}
 
 explore: etl_jobs {}
 
+explore: pagination_test {}
+
 explore: events {
   join: users {
     type: left_outer
@@ -60,6 +62,12 @@ explore: order_items {
     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
     relationship: many_to_one
   }
+
+  join: rank_derived_table {
+    type: left_outer
+    sql_on: ${order_items.id} = ${rank_derived_table.id} ;;
+    relationship: many_to_one
+  }
 }
 
 explore: products {
@@ -69,5 +77,7 @@ explore: products {
     relationship: many_to_one
   }
 }
+
+explore: rank3 {}
 
 explore: users {}
