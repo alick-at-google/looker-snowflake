@@ -16,36 +16,7 @@ include: "/snowflake_test/*.view"
 # }
 
 
-# explore: order_items {
-#   join: users {
-#     type: left_outer
-#     sql_on: ${order_items.user_id} = ${users.id} ;;
-#     relationship: many_to_one
-#   }
-
-#   join: inventory_items {
-#     type: left_outer
-#     sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
-#     relationship: many_to_one
-#   }
-
-#   join: products {
-#     type: left_outer
-#     sql_on: ${inventory_items.product_id} = ${products.id} ;;
-#     relationship: many_to_one
-#   }
-
-#   join: distribution_centers {
-#     type: left_outer
-#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-#     relationship: many_to_one
-#   }
-# }
-
 explore: order_items {
-  # aggregate_table: order_items_rollup_table {
-  #   query: {}
-  # }
 }
 
 # Place in `model_2` model
