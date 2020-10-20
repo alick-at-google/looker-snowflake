@@ -8,17 +8,80 @@ include: "/new_folder/testing.view"
 
 include: "/snowflake_test/*.view"
 
-# # Select the views that should be a part of this model,
-# # and define the joins that connect them together.
-#
 # explore: order_items {
-#   join: orders {
+#   join: products {
 #     relationship: many_to_one
-#     sql_on: ${orders.id} = ${order_items.order_id} ;;
+#     sql_on: ${order_items.special_character_test_5} = ${products.special_character_test} ;;
 #   }
-#
+# }
+
+
+# explore: order_items {
 #   join: users {
+#     type: left_outer
+#     sql_on: ${order_items.user_id} = ${users.id} ;;
 #     relationship: many_to_one
-#     sql_on: ${users.id} = ${orders.user_id} ;;
+#   }
+
+#   join: inventory_items {
+#     type: left_outer
+#     sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
+#     relationship: many_to_one
+#   }
+
+#   join: products {
+#     type: left_outer
+#     sql_on: ${inventory_items.product_id} = ${products.id} ;;
+#     relationship: many_to_one
+#   }
+
+#   join: distribution_centers {
+#     type: left_outer
+#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+#     relationship: many_to_one
+#   }
+# }
+
+explore: order_items {
+  # aggregate_table: order_items_rollup_table {
+  #   query: {}
+  # }
+}
+
+# Place in `model_2` model
+explore: +order_items {
+  aggregate_table: rollup__created_date__sale_price__status {
+    query: {
+      dimensions: [created_date, sale_price, status]
+      measures: [total_sale_price_type_number]
+      timezone: "UTC"
+    }
+
+    materialization: {
+      persist_for: "24 hours"
+    }
+  }
+}
+
+
+
+# explore: fw_agaw_static_operative_capacity_intl {
+#   required_access_grants: [can_access_fw]
+#   label: "FW Daily/Monthly Aggregated Explore"
+
+#   aggregate_table: rollup__activity_date__new_property {
+#     query: {
+#       dimensions: [activity_date, new_property,international_audience,videoclicks,adviews]
+#       measures: [ctr_simple_test]
+#       filters: [
+#         fw_agaw_static_operative_capacity_intl.activity_date: "2020/01/01 to 2020/12/31",
+#         fw_agaw_static_operative_capacity_intl.international_audience: "Yes"
+#       ]
+#       timezone: "UTC"
+#     }
+
+#     materialization: {
+#       datagroup_trigger: cnni_dvi_default_datagroup
+#     }
 #   }
 # }

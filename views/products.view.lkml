@@ -50,6 +50,14 @@ view: products {
     sql: ${TABLE}."SKU" ;;
   }
 
+  dimension: special_character_test {
+    type: string
+    # sql: case when ${department} ='Men' then 'https://ad.doubleclick.net/ddm/trackclk/N5797.1618589PIXABILITYINC./B24521269.280243013;dc_trk_aid=474528003;dc_trk_cid=136662220;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=$\{GDPR\};gdpr_consent=$\{GDPR_CONSENT_755\}'
+    #       else 'https://company.looker.com/test$\{testing\}'
+    #       end;;
+    sql: 'https://company.looker.com/test$\{testing\}' ;;
+  }
+
   measure: count {
     type: count
     drill_fields: [id, name, distribution_centers.name, distribution_centers.id, inventory_items.count]

@@ -165,14 +165,47 @@ view: order_items {
     sql: ${TABLE}."USER_ID" ;;
   }
 
-  measure: test {
-    type: number
-    sql: ${total_sale_price} * (case when ${rank_derived_table.rank} > 8400 then 0 else 1 end) ;;
+  dimension: url {
+    type: string
+    sql: 'https://www.google.com' ;;
+    html: <a href="{{value}}">{{value}}</a> ;;
   }
 
-  measure: test_with_measure_rank {
-    type: number
-    sql: ${total_sale_price} * (case when ${sum_rank} > 150 then 0 else 1 end) ;;
+  dimension: special_character_test {
+    label: "Curly Braces Test"
+    type: string
+    sql: case when ${status} ='Complete' then 'https://company.com/test=$\{testing\}'
+          else ${TABLE}."STATUS" end;;
+  }
+
+  dimension: special_character_test_2 {
+    type: string
+    case: {
+      when: {
+        sql: ${status} ='Cancelled';;
+        label: "https://company.looker.com/test$\{test\}"
+        }
+      else: "{{ order_items.status._value }}"
+      }
+  }
+
+  dimension: special_character_test_3 {
+    type: string
+    sql: case when ${status} ='Cancelled' then concat('https://ad.doubleclick.net/ddm/trackclk/N5797.1618589PIXABILITYINC./B24521269.280243013;dc_trk_aid=474528003;dc_trk_cid=136662220;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=$','{GDPR};gdpr_consent=$','{GDPR_CONSENT_755}')
+    when ${status} ='Complete' then concat('https://company.looker.com/test$','{testing}')
+    else ${TABLE}."STATUS" end;;
+  }
+
+  dimension: special_character_test_4 {
+    type: string
+    sql: case when ${status} ='Cancelled' then 'https://ad.doubleclick.net/ddm/trackclk/N5797.1618589PIXABILITYINC./B24521269.280243013;dc_trk_aid=474528003;dc_trk_cid=136662220;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=$\{GDPR\};gdpr_consent=$\{GDPR_CONSENT_755\}'
+          when ${status} ='Complete' then 'https://company.looker.com/test$\{testing\}'
+          else ${TABLE}."STATUS" end;;
+  }
+
+  dimension: special_character_test_5 {
+    type: string
+    sql: concat('https://company.looker.com/test$','{testing}');;
   }
 
 
@@ -184,10 +217,16 @@ view: order_items {
   measure: total_sale_price {
     type: sum
     sql: ${sale_price} ;;
-    html: {%if total_sale_price < 0 %}
-    {{value}}
-    {% else %}
-    {% endif %};;
+    value_format_name: usd_0
+    # html: {%if total_sale_price < 0 %}
+    # {{value}}
+    # {% else %}
+    # {% endif %};;
+  }
+
+  measure: total_sale_price_type_number {
+    type: number
+    sql: sum(${sale_price}) ;;
   }
 
   measure: total_sale_price_2019 {
@@ -213,11 +252,22 @@ view: order_items {
     value_format_name: usd_0
   }
 
+######## Rank test for CJ
 
-  measure: sum_rank {
-    type: sum
-    sql:${rank_derived_table.rank} ;;
-  }
+  # measure: rank_calculation_test_with_case_statement {
+  #   type: number
+  #   sql: ${total_sale_price} * (case when ${rank_derived_table.rank} > 8400 then 0 else 1 end) ;;
+  # }
+
+  # measure: test_with_measure_rank {
+  #   type: number
+  #   sql: ${total_sale_price} * (case when ${sum_rank} > 150 then 0 else 1 end) ;;
+  # }
+
+  # measure: sum_rank {
+  #   type: sum
+  #   sql:${rank_derived_table.rank} ;;
+  # }
 
   # ----- Sets of fields for drilling ------
   set: detail {
