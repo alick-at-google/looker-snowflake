@@ -23,13 +23,14 @@ explore: order_items {
 explore: +order_items {
   aggregate_table: rollup__created_date__sale_price__status {
     query: {
-      dimensions: [created_date, sale_price, status]
-      measures: [total_sale_price_type_number]
+      dimensions: [created_date, status]
+      # measures: [total_sale_price_type_number]
+      measures: [average_order_price]
       timezone: "UTC"
     }
 
     materialization: {
-      persist_for: "24 hours"
+      persist_for: "5 minutes"
     }
   }
 }

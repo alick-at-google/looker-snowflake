@@ -224,11 +224,6 @@ view: order_items {
     # {% endif %};;
   }
 
-  measure: total_sale_price_type_number {
-    type: number
-    sql: sum(${sale_price}) ;;
-  }
-
   measure: total_sale_price_2019 {
     type: sum
     sql: ${sale_price};;
@@ -251,6 +246,39 @@ view: order_items {
     sql: 1.0*${total_sale_price_2019}/nullif(${count_orders_2019},0) ;;
     value_format_name: usd_0
   }
+
+##### Aggregate table test using measures of type: number
+
+  measure: sum_sale_price_type_number {
+    type: number
+    sql: sum(${sale_price}) ;;
+  }
+
+  measure: max_sale_price_type_number {
+    type: number
+    sql: max(${sale_price}) ;;
+  }
+
+  measure: count_sale_price_type_number {
+    type: number
+    sql: count(${sale_price}) ;;
+  }
+
+  measure: total_sale_price_type_number {
+    description: "references the total_sale_price measure of type: sum"
+    type: number
+    sql: ${total_sale_price} ;;
+  }
+
+
+  # measure: ctr {
+  #   type: number
+  #   label: "CTR"
+  #   sql: COALESCE( SUM(${videoclicks}) * 1.00 / IFNULL( SUM(${adviews}), SUM(${videoclicks})) ,0) ;;
+  #   value_format: "0.0%"
+  #   drill_fields: [activity_month_month, custom_deal_type, modality, section, ctr]
+  # }
+
 
 ######## Rank test for CJ
 
