@@ -64,6 +64,7 @@ explore: +order_items {
 }
 
 
+##### Customer's agg table
 
 # explore: fw_agaw_static_operative_capacity_intl {
 #   required_access_grants: [can_access_fw]
