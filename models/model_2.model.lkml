@@ -16,6 +16,8 @@ include: "/snowflake_test/*.view"
 # }
 
 
+explore: products_capitalization {}
+
 explore: order_items {
 }
 
