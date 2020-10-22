@@ -3,6 +3,11 @@ view: users {
     ;;
   drill_fields: [id]
 
+  # parameter: state_parameter {
+  #   type: unquoted
+  #   suggest_dimension: state
+  # }
+
   dimension: id {
     primary_key: yes
     type: number

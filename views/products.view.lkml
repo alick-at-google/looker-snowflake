@@ -19,6 +19,19 @@ view: products {
     sql: ${TABLE}."CATEGORY" ;;
   }
 
+  dimension: category_capitalization {
+    type: string
+    sql: case when ${category} = "Leggings" then "pants"
+    when ${category} = "Accessories" then "accessories"
+    when ${category} = "Skirts" then "socks"
+    when ${category} = "Plus" then "jeans-hi"
+    when ${category} = "Maternity" then "pants"
+    when ${category} = "Swim" then null
+    when ${category} = "Shorts" then "jeans"
+    else ${category}
+    end ;;
+  }
+
   dimension: cost {
     type: number
     sql: ${TABLE}."COST" ;;

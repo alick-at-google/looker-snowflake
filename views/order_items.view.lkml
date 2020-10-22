@@ -230,6 +230,12 @@ view: order_items {
     filters: [created_year: "2019"]
   }
 
+  measure: total_sale_price_2018 {
+    type: sum
+    sql: ${sale_price};;
+    filters: [created_year: "2018"]
+  }
+
   measure: count_orders_2019 {
     type: count
     filters: [created_year: "2019"]
@@ -268,6 +274,11 @@ view: order_items {
     description: "references the total_sale_price measure of type: sum"
     type: number
     sql: ${total_sale_price} ;;
+  }
+
+  measure: reference_sums_and_divide {
+    type: number
+    sql: 1.0*${total_sale_price}/nullif(${total_sale_price},${total_sale_price}+2) ;;
   }
 
 
