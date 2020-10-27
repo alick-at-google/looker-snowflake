@@ -9,6 +9,36 @@ view: products {
     sql: ${TABLE}."ID" ;;
   }
 
+  parameter: dimension_picker {
+    type:  string
+    allowed_value: {
+      label: "Brand"
+      value: "brand" }
+    allowed_value: {
+      label: "Category"
+      value: "category" }
+    allowed_value: {
+      label: "Department"
+      value: "department" }
+    allowed_value: {
+      label: "None"
+      value: "-" }
+  }
+
+  dimension: dynamic_dimension {
+    type: string
+    label_from_parameter: dimension_picker
+    sql:     {% if dimension_picker._parameter_value == "'brand'" %}
+       ${brand}
+    {% elsif dimension_picker._parameter_value == "'category'" %}
+       ${category}
+    {% elsif dimension_picker._parameter_value == "'department'" %}
+        ${department}
+    {% elsif dimension_picker._parameter_value == "'-'" %}
+       '-'
+    {% endif %} ;;
+  }
+
   dimension: brand {
     type: string
     sql: ${TABLE}."BRAND" ;;
@@ -74,5 +104,10 @@ view: products {
   measure: count {
     type: count
     drill_fields: [id, name, distribution_centers.name, distribution_centers.id, inventory_items.count]
+  }
+
+  measure: group_concat_category {
+    type: string
+    sql: GROUP_CONCAT(${category}) ;;
   }
 }

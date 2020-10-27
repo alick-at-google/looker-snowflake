@@ -20,6 +20,7 @@ view: products_capitalization {
       ORDER BY 4 DESC
       LIMIT 500
        ;;
+      persist_for: "24 hours"
 }
 
 measure: count {
@@ -41,6 +42,37 @@ dimension: products_category_capitalization {
   type: string
   sql: ${TABLE}."products.category_capitalization" ;;
 }
+
+  dimension: products_category_capitalization_case_when {
+    type: string
+    case: {
+      when: {
+        sql: ${TABLE}."products.category_capitalization" = 'accessories' ;;
+        label: "accessories"
+      }
+      when: {
+        sql: ${TABLE}."products.category_capitalization" = 'Active' ;;
+         label: "Active"
+        }
+        when: {
+          sql: ${TABLE}."products.category_capitalization" = 'Jeans' ;;
+          label: "Jeans"
+        }
+        when: {
+          sql: ${TABLE}."products.category_capitalization" = 'jeans' ;;
+          label: "jeans"
+          }
+          when: {
+            sql: ${TABLE}."products.category_capitalization" = 'Pants' ;;
+            label: "Pants"
+            }
+          when: {
+            sql: ${TABLE}."products.category_capitalization"= 'pants' ;;
+            label: "pants"
+          }
+          else: "clothing"
+    }
+  }
 
 dimension: products_count {
   type: number
