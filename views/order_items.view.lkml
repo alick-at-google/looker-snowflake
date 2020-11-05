@@ -264,15 +264,21 @@ view: order_items {
     # {% endif %};;
   }
 
-  measure: total_sale_price_decimal_value_format {
-    type: sum
-    sql: ${sale_price} ;;
+  measure: order_count_usd_value_format {
+    type: count_distinct
+    sql: ${order_id} ;;
+    value_format_name: usd
+  }
+
+  measure: order_count_decimal_value_format {
+    type: count_distinct
+    sql: ${order_id} ;;
     value_format_name: decimal_2
   }
 
-  measure: total_sale_price_decimal_value_format_html {
-    type: sum
-    sql: ${sale_price} ;;
+  measure: order_count_decimal_value_format_html {
+    type: count_distinct
+    sql: ${order_id} ;;
     value_format_name: decimal_2
     html: €{{rendered_value}} ;;
     # drill_fields: [drill_set*]
