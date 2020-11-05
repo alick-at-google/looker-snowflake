@@ -15,11 +15,20 @@ include: "/snowflake_test/*.view"
 #   }
 # }
 
+view: +order_items {
+  dimension: new_dimension_test {
+    type: string
+    sql: 'new dimension' ;;
+  }
+}
+
 
 explore: products_capitalization {}
 
-explore: order_items {
-}
+explore: transpose_measures_dt {}
+
+# explore: order_items {
+# }
 
 # Place in `model_2` model
 explore: +order_items {
@@ -36,6 +45,49 @@ explore: +order_items {
     }
   }
 }
+
+
+explore: order_items {
+  sql_always_where: {% condition products.category_parameter %} products.category {% endcondition %} ;;
+  join: users {
+    type: left_outer
+    sql_on: ${order_items.user_id} = ${users.id} ;;
+    relationship: many_to_one
+  }
+
+  join: inventory_items {
+    type: left_outer
+    sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
+    relationship: many_to_one
+  }
+
+  join: products {
+    type: left_outer
+    sql_on: ${inventory_items.product_id} = ${products.id} ;;
+    relationship: many_to_one
+  }
+
+  join: distribution_centers {
+    type: left_outer
+    sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+    relationship: many_to_one
+  }
+
+  join: rank_derived_table {
+    type: left_outer
+    sql_on: ${order_items.id} = ${rank_derived_table.id} ;;
+    relationship: many_to_one
+  }
+}
+
+explore: products {
+  join: distribution_centers {
+    type: left_outer
+    sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+    relationship: many_to_one
+  }
+}
+
 
 
 ##### Customer's agg table

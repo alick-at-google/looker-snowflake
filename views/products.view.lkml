@@ -9,6 +9,12 @@ view: products {
     sql: ${TABLE}."ID" ;;
   }
 
+  dimension: line_break {
+    type: string
+    html: <div style="white-space:pre">{{ value }}</div> ;;
+    sql: concat(${department},'\r\n',${category}) ;;
+   }
+
   parameter: dimension_picker {
     type:  string
     allowed_value: {
@@ -23,6 +29,16 @@ view: products {
     allowed_value: {
       label: "None"
       value: "-" }
+  }
+
+  parameter: category_parameter {
+    type: string
+    allowed_value: {
+      label: "Accessories"
+      value: "Accessories" }
+    allowed_value: {
+      label: "Jeans"
+      value: "Jeans" }
   }
 
   dimension: dynamic_dimension {
@@ -47,6 +63,12 @@ view: products {
   dimension: category {
     type: string
     sql: ${TABLE}."CATEGORY" ;;
+  }
+
+
+  dimension: categories_yesno {
+    type: yesno
+    sql: ${category} = 'Accessories' OR ${category} = 'Jeans';;
   }
 
   dimension: category_capitalization {

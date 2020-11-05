@@ -3,6 +3,46 @@ view: order_items {
     ;;
   drill_fields: [id]
 
+  dimension: status2 {
+    type: string
+    sql: case when ${TABLE}."STATUS" is null then 'static string' else ${TABLE}."STATUS" end;;
+}
+
+  dimension: status_total {
+    type: string
+    sql: 'Total' ;;
+  }
+
+  dimension: status_case_when {
+    type: string
+    case: {
+      when: {
+        label: "Complete"
+        sql: ${status} = 'Complete' ;;
+      }
+      when: {
+        label: "Cancelled"
+        sql: ${status} = 'Cancelled' ;;
+      }
+      when: {
+        label: "Returned"
+        sql: ${status} = 'Returned' ;;
+      }
+      when: {
+        label: "Shipped"
+        sql: ${status} = 'Shipped' ;;
+      }
+      when: {
+        label: "Processing"
+        sql: ${status} = 'Processing' ;;
+      }
+      when: {
+        label: "Total"
+        sql: 1=1 ;;
+      }
+    }
+  }
+
   dimension: id {
     primary_key: yes
     type: number
@@ -224,17 +264,108 @@ view: order_items {
     # {% endif %};;
   }
 
-  measure: total_sale_price_2019 {
+  measure: total_sale_price_decimal_value_format {
+    type: sum
+    sql: ${sale_price} ;;
+    value_format_name: decimal_2
+  }
+
+  measure: total_sale_price_decimal_value_format_html {
+    type: sum
+    sql: ${sale_price} ;;
+    value_format_name: decimal_2
+    html: €{{rendered_value}} ;;
+    # drill_fields: [drill_set*]
+  }
+
+############ Total Sale Price per Year Parameter Test ##############
+
+parameter: year_selector {
+  type: string
+  allowed_value: { value: "2016" }
+  allowed_value: { value: "2017" }
+  allowed_value: { value: "2018" }
+  allowed_value: { value: "2019" }
+  allowed_value: { value: "2020" }
+}
+
+  measure: dynamic_total_sale_price_by_year {
+    type: number
+    label_from_parameter: year_selector
+    sql:
+      CASE
+        WHEN {% parameter year_selector %} = '2016' THEN ${total_sale_price_2016}
+        WHEN {% parameter year_selector %} = '2017' THEN ${total_sale_price_2017}
+        WHEN {% parameter year_selector %} = '2018' THEN ${total_sale_price_2018}
+        WHEN {% parameter year_selector %} = '2019' THEN ${total_sale_price_2019}
+        WHEN {% parameter year_selector %} = '2020' THEN ${total_sale_price_2020}
+        ELSE NULL
+        END ;;
+    value_format_name: usd_0
+  }
+
+  # measure: dynamic_total_sale_price_by_year_filter {
+  #   type: number
+  #   sql:
+  #   {% condition year_selector_filter %} = '2016' THEN ${total_sale_price_2016}
+  #       WHEN {% parameter year_selector %} = '2017' THEN ${total_sale_price_2017}
+  #       WHEN {% parameter year_selector %} = '2018' THEN ${total_sale_price_2018}
+  #       WHEN {% parameter year_selector %} = '2019' THEN ${total_sale_price_2019}
+  #       WHEN {% parameter year_selector %} = '2020' THEN ${total_sale_price_2020}
+  #       ELSE NULL
+  #       END ;;
+  #   value_format_name: usd_0
+  # }
+
+
+  filter: year_selector_filter {
+    type: string
+    suggest_dimension: created_year
+  }
+
+  measure: total_sale_price_2020 {
+    group_label: "Total Sale Price - Specific Years"
     type: sum
     sql: ${sale_price};;
+    value_format_name: usd_0
+    filters: [created_year: "2020"]
+  }
+
+  measure: total_sale_price_2019 {
+    group_label: "Total Sale Price - Specific Years"
+    type: sum
+    sql: ${sale_price};;
+    value_format_name: usd_0
     filters: [created_year: "2019"]
   }
 
   measure: total_sale_price_2018 {
+    group_label: "Total Sale Price - Specific Years"
     type: sum
     sql: ${sale_price};;
+    value_format_name: usd_0
     filters: [created_year: "2018"]
   }
+
+  measure: total_sale_price_2017 {
+    group_label: "Total Sale Price - Specific Years"
+    type: sum
+    sql: ${sale_price};;
+    value_format_name: usd_0
+    filters: [created_year: "2017"]
+  }
+
+  measure: total_sale_price_2016 {
+    group_label: "Total Sale Price - Specific Years"
+    type: sum
+    sql: ${sale_price};;
+    value_format_name: usd_0
+    filters: [created_year: "2016"]
+  }
+
+
+###############
+
 
   measure: count_orders_2019 {
     type: count
