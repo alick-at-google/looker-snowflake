@@ -386,7 +386,13 @@ parameter: year_selector {
   measure: average_order_price {
     type: number
     sql: 1.0*${total_sale_price}/nullif(${count},0) ;;
-    value_format_name: usd_0
+    # value_format_name: usd_0
+  }
+
+  measure: average_order_price_value_format {
+    type: average
+    sql: ${sale_price} ;;
+    value_format: "[mod 0]0;[mod 1]0.#;[mod 2]0.##"
   }
 
   measure: average_order_price_2019 {
