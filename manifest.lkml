@@ -6,13 +6,13 @@ constant: schema_name {
 
 visualization: {
   id: "treemap-danielle"
-  label: "Treemap Danielle Test"
+  label: "Treemap Danielle"
   url: "https://github.com/looker/custom_visualizations_v2/tree/master/dist/treemap.js"
 }
 
 visualization: {
-  id: "treemap-danielle-cdn"
-  label: "Treemap Danielle Test - CDN"
+  id: "treemap-danielle-test"
+  label: "Treemap Danielle Test"
   url: "https://looker-custom-viz-a.lookercdn.com/master/treemap.js"
 }
 
