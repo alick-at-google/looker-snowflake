@@ -64,6 +64,11 @@ view: order_items {
     sql: ${TABLE}."CREATED_AT" ;;
   }
 
+  dimension: year {
+    type: string
+    sql: ${created_year} ;;
+  }
+
   dimension_group: delivered {
     type: time
     timeframes: [
