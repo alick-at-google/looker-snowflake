@@ -2,7 +2,7 @@ connection: "snowflakelooker"
 
 include: "/views/*.view.lkml"                # include all views in the views/ folder in this project
 # include: "/**/view.lkml"                   # include all views in this project
-# include: "my_dashboard.dashboard.lookml"   # include a LookML dashboard called my_dashboard
+include: "/*/alert_test_dashboard.dashboard"   # include a LookML dashboard called my_dashboard
 
 include: "/new_folder/testing.view"
 
@@ -25,7 +25,9 @@ view: +order_items {
 
 explore: products_capitalization {}
 
-explore: transpose_measures_dt {}
+# explore: transpose_measures_dt {}
+
+explore: tiers_on_measure {}
 
 # explore: order_items {
 # }
@@ -48,7 +50,8 @@ explore: +order_items {
 
 
 explore: order_items {
-  sql_always_where: {% condition products.category_parameter %} products.category {% endcondition %} ;;
+  sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
+  # {% condition products.category_parameter %} products.category {% endcondition %} AND
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;

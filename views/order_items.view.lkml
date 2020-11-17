@@ -13,6 +13,64 @@ view: order_items {
     sql: 'Total' ;;
   }
 
+  ###### HTML IMAGES ###########
+  dimension: aon_logo {
+    type: string
+    sql: 1 ;;
+    html: <img src="https://cdn.filestackcontent.com/fMVx1x2rQb5oHLv0QA4l" height=60% width=60% /> ;;
+  }
+
+  dimension: aon_logo_div_tags {
+    type: string
+    sql: 1 ;;
+    html: <div class="single-value"><img src="https://cdn.filestackcontent.com/fMVx1x2rQb5oHLv0QA4l" height=60% width=60% /> </div> ;;
+  }
+
+  ##########
+
+  parameter: is_large_order {
+    type: number
+    allowed_value: {
+      label: "Yes"
+      value: "1"
+    }
+    allowed_value: {
+      label: "No"
+      value: "0"
+    }
+    allowed_value: {
+      label: "All Results"
+      value: ""
+    }
+  }
+
+  dimension: is_big_order {
+    type: yesno
+    sql: ${sale_price}>=200 ;;
+  }
+
+  dimension: large_order_flag {
+    type: number
+    sql: case when ${sale_price}>=200 then 1 else 0 end;;
+  }
+
+  measure: count_big_orders {
+    type: count_distinct
+    sql: case when ${is_big_order} then ${order_id} else null end;;
+  }
+
+  measure: count_small_orders {
+    type: count_distinct
+    sql: case when NOT(${is_big_order}) then ${order_id} else null end;;
+  }
+
+  measure: count_small_orders_filters_param {
+    type: count_distinct
+    sql: ${order_id} ;;
+    filters: [is_big_order: "false"]
+  }
+
+
   dimension: status_case_when {
     type: string
     case: {
@@ -223,34 +281,38 @@ view: order_items {
           else ${TABLE}."STATUS" end;;
   }
 
-  dimension: special_character_test_2 {
-    type: string
-    case: {
-      when: {
-        sql: ${status} ='Cancelled';;
-        label: "https://company.looker.com/test$\{test\}"
-        }
-      else: "{{ order_items.status._value }}"
-      }
+  dimension: sale_price_times_100 {
+    type: number
+    sql: ${TABLE}.sale_price * 100 ;;
+    # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
   }
 
-  dimension: special_character_test_3 {
+  dimension: sale_price_manual_tiers {
     type: string
-    sql: case when ${status} ='Cancelled' then concat('https://ad.doubleclick.net/ddm/trackclk/N5797.1618589PIXABILITYINC./B24521269.280243013;dc_trk_aid=474528003;dc_trk_cid=136662220;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=$','{GDPR};gdpr_consent=$','{GDPR_CONSENT_755}')
-    when ${status} ='Complete' then concat('https://company.looker.com/test$','{testing}')
-    else ${TABLE}."STATUS" end;;
+    sql: case when ${sale_price_times_100} <= 1000 then 'Under $1000'
+          when ${sale_price_times_100} > 1000 AND ${sale_price_times_100} <= 2500 then '$1,000 - $2,500'
+          when ${sale_price_times_100} > 2500 AND ${sale_price_times_100} <= 5000 then '$2,500 - $5,000'
+          when ${sale_price_times_100} > 5000 AND ${sale_price_times_100} <= 10000 then '$5,000 - $10,000'
+          when ${sale_price_times_100} > 10000 AND ${sale_price_times_100} <= 12500 then '$10,000 - $12,500'
+          when ${sale_price_times_100} > 12500 AND ${sale_price_times_100} <= 20000 then '$12,500 - $20,000'
+          when ${sale_price_times_100} > 20000 AND ${sale_price_times_100} <= 25000 then '$20,000 - $25,000'
+          when ${sale_price_times_100} > 25000 AND ${sale_price_times_100} <= 100000 then 'Above $100,000'
+          else null end;;
+    order_by_field: sort_order_2
   }
 
-  dimension: special_character_test_4 {
-    type: string
-    sql: case when ${status} ='Cancelled' then 'https://ad.doubleclick.net/ddm/trackclk/N5797.1618589PIXABILITYINC./B24521269.280243013;dc_trk_aid=474528003;dc_trk_cid=136662220;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=$\{GDPR\};gdpr_consent=$\{GDPR_CONSENT_755\}'
-          when ${status} ='Complete' then 'https://company.looker.com/test$\{testing\}'
-          else ${TABLE}."STATUS" end;;
-  }
-
-  dimension: special_character_test_5 {
-    type: string
-    sql: concat('https://company.looker.com/test$','{testing}');;
+  dimension: sort_order_2 {
+    type: number
+    sql: case when ${sale_price_times_100} <= 1000 then 1
+          when ${sale_price_times_100} > 1000 AND ${sale_price_times_100} <= 2500 then 10
+          when ${sale_price_times_100} > 2500 AND ${sale_price_times_100} <= 5000 then 25
+          when ${sale_price_times_100} > 5000 AND ${sale_price_times_100} <= 10000 then 50
+          when ${sale_price_times_100} > 10000 AND ${sale_price_times_100} <= 12500 then 100
+          when ${sale_price_times_100} > 12500 AND ${sale_price_times_100} <= 20000 then 125
+          when ${sale_price_times_100} > 20000 AND ${sale_price_times_100} <= 25000 then 200
+          when ${sale_price_times_100} > 25000 AND ${sale_price_times_100} <= 100000 then 250
+      end
+       ;;
   }
 
 
