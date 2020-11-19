@@ -50,8 +50,9 @@ explore: +order_items {
 
 
 explore: order_items {
-  sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
+  # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
   # {% condition products.category_parameter %} products.category {% endcondition %} AND
+  cancel_grouping_fields: [users.state,users.city]
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;

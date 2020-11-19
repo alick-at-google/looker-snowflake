@@ -9,6 +9,21 @@ view: products {
     sql: ${TABLE}."ID" ;;
   }
 
+  dimension: html_test {
+    type: string
+    sql: 1 ;;
+    html:
+    <div style="background: #339966;
+    color: #ffffff;
+    font-size: medium;
+    padding: 5px 5px;
+    align-self: center;
+    font: Tahoma;
+    vertical-align: middle;
+    word-wrap:break-word;
+    max-width: 100%" class="single-value">Missing Data</div>;;
+  }
+
   dimension: line_break {
     type: string
     html: <div style="white-space:pre">{{ value }}</div> ;;

@@ -443,6 +443,7 @@ parameter: year_selector {
   measure: count_orders_2019 {
     type: count
     filters: [created_year: "2019"]
+    drill_fields: [users.state, users.city]
   }
 
   measure: average_order_price {
