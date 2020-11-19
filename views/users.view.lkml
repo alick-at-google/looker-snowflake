@@ -89,6 +89,33 @@ view: users {
     sql: ${TABLE}."ZIP" ;;
   }
 
+  dimension: first_name_action {
+    type: string
+    sql: ${TABLE}.first_name ;;
+    action: {
+      label: "Cool Name?"
+      url: "https://my_server_name/endpoint_name"
+
+      param: {
+        name: "name"
+        value: "{{ value }}"
+      }
+      form_param: {
+        name: "annotation"
+        type: select
+        label: "Cool name?"
+        default: "No"
+        description: "Do you think that this name is a cool name?"
+        option: {
+          name: "No"
+        }
+        option: {
+          name: "Yes"
+        }
+      }
+    }
+  }
+
   measure: count {
     type: count
     drill_fields: [id, first_name, last_name, events.count, order_items.count]
