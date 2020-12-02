@@ -50,7 +50,7 @@ view: tiers_on_measure {
     sql: ${lifetime_users_count} ;;
   }
 
-  # set: detail {
-  #   fields: [users_id, lifetime_order_items_count, lifetime_orders_count]
-  # }
+  set: detail {
+    fields: [users_id, lifetime_order_items_count]
+  }
 }

@@ -22,37 +22,60 @@ view: +order_items {
   }
 }
 
+datagroup: snowflake_test_default_datagroup {
+  sql_trigger: SELECT current_date() ;;
+  max_cache_age: "1 hour"
+}
 
 explore: products_capitalization {}
 
 # explore: transpose_measures_dt {}
 
-explore: tiers_on_measure {}
+explore: tiers_on_measure {
+  cancel_grouping_fields: []
+}
 
 # explore: order_items {
 # }
 
 # Place in `model_2` model
-explore: +order_items {
-  aggregate_table: rollup__created_date__sale_price__status {
-    query: {
-      dimensions: [created_date, sale_price, status]
-      # measures: [sum_sale_price_type_number]
-      measures: [reference_sums_and_divide]
-      timezone: "America/Los_Angeles"
-    }
+# explore: +order_items {
+#   aggregate_table: rollup__created_date__sale_price__status {
+#     query: {
+#       dimensions: [created_date, sale_price, status]
+#       # measures: [sum_sale_price_type_number]
+#       measures: [reference_sums_and_divide]
+#       timezone: "America/Los_Angeles"
+#     }
 
-    materialization: {
-      persist_for: "5 minutes"
-    }
-  }
-}
+#     materialization: {
+#       persist_for: "5 minutes"
+#     }
+#   }
+# }
 
+
+  # access_filter: {
+  #   field: products.category
+  #   user_attribute: categories_test
+  # }
+
+# cancel_grouping_fields: [users.state,users.city]
 
 explore: order_items {
+
   # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
   # {% condition products.category_parameter %} products.category {% endcondition %} AND
-  cancel_grouping_fields: [users.state,users.city]
+  # sql_always_where: {% if order_items.date_filter_1._is_filtered %} ${order_items.created_test_date} BETWEEN ifnull({% date_start order_items.date_filter_1 %},to_date('2000-01-01')) AND ifnull({% date_end order_items.date_filter_1 %},to_date('2100-01-01')) {%else%} 1=1 {%endif%} ;;
+  # sql_always_where: {% if order_items.create_test_date._is_filtered %} ${45_date_range_dim_ref} {% else %} 1=1 {% endif %} ;;
+  # sql_always_where: ${45_date_range_dim_ref} ;;
+
+# access_filter: {
+#   field: order_items.status
+#   user_attribute: status
+# }
+
+
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;

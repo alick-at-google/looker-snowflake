@@ -1,5 +1,6 @@
 view: orders_by_quarter_derived_table {
   derived_table: {
+    datagroup_trigger: snowflake_test_default_datagroup
     sql: -- Did not use order_items::rollup__created_date__sale_price__status; query contains time based fields order_items.created_quarter, order_items.created_year and derived table has timezone America/Los_Angeles, while query has no query timezone (it is running in the db timezone)
       SELECT
           (TO_CHAR(DATE_TRUNC('month', CAST(DATE_TRUNC('quarter', order_items."CREATED_AT" ) AS DATE)), 'YYYY-MM')) AS "order_items.created_quarter",

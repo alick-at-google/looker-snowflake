@@ -13,6 +13,70 @@ view: order_items {
     sql: 'Total' ;;
   }
 
+  measure: static_value {
+    type: number
+    sql: 2500 ;;
+  }
+
+  filter: date_filter_1 {
+    type: date
+  }
+
+  filter: number {
+    type: number
+  }
+
+  dimension: sale_price_filtered {
+    type: number
+    sql: case when {% condition number %} ${sale_price} {% endcondition %} then ${sale_price} else null end;;
+  }
+
+  dimension: 45_date_range {
+    type: number
+    sql: DATEDIFF(day, {% date_start date_filter_1 %}, {% date_end date_filter_1 %});;
+  }
+
+  dimension: 45_date_range_dim_ref {
+    type: yesno
+    sql: DATEDIFF(day, {% date_start create_test_date %}, {% date_end create_test_date %}) <= 45;;
+  }
+
+  dimension_group: create_test {
+    type: time
+    timeframes: [
+      raw,
+      time,
+      time_of_day,
+      hour_of_day,
+      date,
+      day_of_week,
+      day_of_week_index,
+      week,
+      week_of_year,
+      month,
+      month_name,
+      month_num,
+      day_of_month,
+      quarter,
+      year
+    ]
+    # sql: {% condition date_filter_1 %} ${TABLE}.created_at {% endcondition %};;
+    sql: ${TABLE}.created_at ;;
+  }
+
+  dimension: created_test_date {
+    type: date
+    sql: ${create_test_date};;
+  }
+
+
+  ######################
+
+  filter: custom_date_sql_filter {
+    type: date
+    # sql: SELECT ${TABLE.created_raw} where  ;;
+  }
+
   ###### HTML IMAGES ###########
   dimension: aon_logo {
     type: string
