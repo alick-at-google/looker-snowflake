@@ -30,6 +30,18 @@ view: products {
     sql: concat(${department},'\r\n',${category}) ;;
    }
 
+  dimension: html_font_size_test {
+    type: string
+    sql: 'test' ;;
+    html: <p style="font-size: 50%"><a href="/dashboards/980">Latest data as of {{rendered_value}}</a></p> ;;
+  }
+
+  dimension: html_font_size_2 {
+    type: string
+    sql: 'test' ;;
+    html: <p style="font-size:14px"><a href="/dashboards/980">Click to drill to dashboard</a></p> ;;
+  }
+
   parameter: dimension_picker {
     type:  string
     allowed_value: {

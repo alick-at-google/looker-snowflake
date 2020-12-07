@@ -31,6 +31,10 @@ explore: products_capitalization {}
 
 # explore: transpose_measures_dt {}
 
+explore: running_total_derived_table {}
+
+explore: running_total_ndt {}
+
 explore: tiers_on_measure {
   cancel_grouping_fields: []
 }
@@ -109,6 +113,12 @@ explore: order_items {
   join: orders_by_quarter_derived_table {
     type: left_outer
     sql_on: ${order_items.created_quarter} = ${orders_by_quarter_derived_table.order_items_created_quarter} AND ${products.category} = ${orders_by_quarter_derived_table.products_category};;
+    relationship: many_to_one
+  }
+
+  join: running_total_derived_table {
+    type: left_outer
+    sql_on: ${order_items.created_month} = ${running_total_derived_table.created_month} ;;
     relationship: many_to_one
   }
 }

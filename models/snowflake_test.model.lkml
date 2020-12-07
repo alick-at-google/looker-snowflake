@@ -68,6 +68,13 @@ explore: order_items {
     sql_on: ${order_items.id} = ${rank_derived_table.id} ;;
     relationship: many_to_one
   }
+
+
+  join: orders_by_quarter_derived_table {
+    type: left_outer
+    sql_on: ${order_items.created_quarter} = ${orders_by_quarter_derived_table.order_items_created_quarter} AND ${products.category} = ${orders_by_quarter_derived_table.products_category};;
+    relationship: many_to_one
+  }
 }
 
 explore: products {

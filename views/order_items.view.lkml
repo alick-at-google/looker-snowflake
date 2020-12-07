@@ -385,6 +385,11 @@ view: order_items {
     drill_fields: [detail*]
   }
 
+  measure: count_complete {
+    type: count
+    filters: [status: "Complete"]
+  }
+
   measure: total_sale_price {
     type: sum
     sql: ${sale_price} ;;
@@ -526,6 +531,12 @@ parameter: year_selector {
     type: number
     sql: 1.0*${total_sale_price_2019}/nullif(${count_orders_2019},0) ;;
     value_format_name: usd_0
+  }
+
+  measure: running_total {
+    type: running_total
+    sql: ${count} ;;
+    direction: "column"
   }
 
 ##### Aggregate table test using measures of type: number

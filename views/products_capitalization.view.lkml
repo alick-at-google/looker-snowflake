@@ -20,7 +20,8 @@ view: products_capitalization {
       ORDER BY 4 DESC
       LIMIT 500
        ;;
-      persist_for: "24 hours"
+      # persist_for: "24 hours"
+      datagroup_trigger: snowflake_test_default_datagroup
 }
 
 measure: count {
