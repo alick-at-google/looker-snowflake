@@ -26,6 +26,11 @@ view: order_items {
     type: number
   }
 
+  dimension: user_attribute_test {
+    type: number
+    sql: {{ _user_attributes['danielle_number_test'] }} ;;
+  }
+
   dimension: sale_price_filtered {
     type: number
     sql: case when {% condition number %} ${sale_price} {% endcondition %} then ${sale_price} else null end;;
@@ -67,6 +72,20 @@ view: order_items {
   dimension: created_test_date {
     type: date
     sql: ${create_test_date};;
+  }
+
+  dimension: current_date {
+    type: date
+    sql: current_date();;
+  }
+
+  measure: total_sale_price_2020_test {
+    # group_label: "Total Sale Price - Specific Years"
+    label: "total sale price for {{ order_items.current_date._value }}"
+    type: sum
+    sql: ${sale_price};;
+    value_format_name: usd_0
+    filters: [created_year: "2020"]
   }
 
 
@@ -351,6 +370,13 @@ view: order_items {
     # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
   }
 
+  dimension: sale_price_times_negative_10 {
+    type: number
+    sql: ${TABLE}.sale_price * -10 ;;
+    value_format_name: decimal_2
+    # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
+  }
+
   dimension: sale_price_manual_tiers {
     type: string
     sql: case when ${sale_price_times_100} <= 1000 then 'Under $1000'
@@ -399,6 +425,30 @@ view: order_items {
     # {% else %}
     # {% endif %};;
   }
+
+  measure: total_sale_price_negative {
+    type: sum
+    sql: ${sale_price_times_negative_10} ;;
+    value_format_name: decimal_2
+  }
+
+  measure: percent_of_total_sale_price {
+    type: percent_of_total
+    sql: ${total_sale_price};;
+  }
+
+  measure: average_sale_price {
+    type: average
+    sql: ${sale_price}/100 ;;
+    value_format_name: percent_2
+  }
+
+  measure: yoy_percent_change_order_items{
+    type: number
+    sql: (${count}-${count_orders_2019})/nullif(${count_orders_2019},0) ;;
+    value_format_name: percent_2
+  }
+
 
   measure: order_count_usd_value_format {
     type: count_distinct
