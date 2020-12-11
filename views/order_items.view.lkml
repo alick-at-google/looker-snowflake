@@ -443,12 +443,6 @@ view: order_items {
     value_format_name: percent_2
   }
 
-  measure: yoy_percent_change_order_items{
-    type: number
-    sql: (${count}-${count_orders_2019})/nullif(${count_orders_2019},0) ;;
-    value_format_name: percent_2
-  }
-
 
   measure: order_count_usd_value_format {
     type: count_distinct
@@ -558,11 +552,20 @@ parameter: year_selector {
 
 ###############
 
+  measure: count_orders_2020 {
+    type: count
+    filters: [created_year: "2020"]
+  }
 
   measure: count_orders_2019 {
     type: count
     filters: [created_year: "2019"]
-    drill_fields: [users.state, users.city]
+  }
+
+  measure: yoy_percent_change_order_items{
+    type: number
+    sql: (${count_orders_2020}-${count_orders_2019})/nullif(${count_orders_2019},0) ;;
+    value_format_name: percent_2
   }
 
   measure: average_order_price {
