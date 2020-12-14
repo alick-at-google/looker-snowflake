@@ -568,6 +568,12 @@ parameter: year_selector {
     value_format_name: percent_2
   }
 
+  measure: total_users_over_total_orders {
+    type: number
+    sql: ${users.count}/nullif(${count},0) ;;
+    value_format_name: percent_2
+  }
+
   measure: average_order_price {
     type: number
     sql: 1.0*${total_sale_price}/nullif(${count},0) ;;
