@@ -69,6 +69,28 @@ view: order_items {
     sql: ${TABLE}.created_at ;;
   }
 
+  dimension_group: time_between_created_and_returned {
+    type: duration
+    intervals: [second, minute, hour, day, week]
+    # sql: {% condition date_filter_1 %} ${TABLE}.created_at {% endcondition %};;
+    sql_start: ${TABLE}.created_at ;;
+    sql_end: ${TABLE}.returned_at ;;
+  }
+
+  # measure: duration_50th_percentile {
+  #   type: percentile
+  #   percentile: 50
+  #   sql: ${seconds_time_between_created_and_returned_duration}  ;;
+  # }
+
+  # measure: duration_25th_percentile {
+  #   type: percentile
+  #   percentile: 25
+  #   sql: ${seconds_enquiry_process_duration}  ;;
+  # }
+
+
+
   dimension: created_test_date {
     type: date
     sql: ${create_test_date};;
@@ -249,10 +271,38 @@ view: order_items {
     sql: ${TABLE}."RETURNED_AT" ;;
   }
 
+  dimension: html_spacing_test {
+    type: string
+    sql: 'here is some text' ;;
+    html: {% if order_items.status._value == 'Cancelled' %}
+<p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
+<p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}</p>
+<p style="font-size:15px; text-align:center">The Warehouse load has not yet competed<br>Looks or Dashboards using this Wareouse<br>will not yet return data</p>
+    {% elsif order_items.status._value == 'Complete' %}
+    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
+    <p style="color: black; background-color: crimson; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
+    <p style="font-size:15px; text-align:center">The Warehouse is available but not up to current date</p>
+    {% elsif order_items.status._value == 'Pending' %}
+    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
+    <p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
+    <p style="font-size:15px; text-align:center">The Warehouse is available but not all staging<br>tables are up to date</p>
+    {% else %}
+    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
+    <p style="color: black; background-color: white; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:30px">{{ order_items.created_date._value }}</span></p>
+    {% endif %} ;;
+  }
+
   dimension: sale_price {
     type: number
     sql: ${TABLE}."SALE_PRICE" ;;
     # value_format_name: id
+  }
+
+  dimension: sale_price_tiers {
+    type: tier
+    tiers: [0, 10, 20, 30, 40, 50, 60, 100, 150, 200, 250, 300]
+    style: integer
+    sql: ${sale_price} ;;
   }
 
   dimension: sale_price_value_format_id_type {
