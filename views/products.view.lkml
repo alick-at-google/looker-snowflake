@@ -1,7 +1,13 @@
 view: products {
-  sql_table_name: "PUBLIC"."PRODUCTS"
-    ;;
+  sql_table_name: "PUBLIC"."PRODUCTS";;
+  # sql_table_name: "PUBLIC".{% parameter category_param %}_table ;;
   drill_fields: [id]
+
+
+  # parameter: category_param {
+  #   type: unquoted
+  #   suggest_dimension: products.category
+  # }
 
   dimension: id {
     primary_key: yes
@@ -66,6 +72,22 @@ view: products {
     allowed_value: {
       label: "Jeans"
       value: "Jeans" }
+  }
+
+  parameter: category_param_with_suggest_dimension {
+    type: string
+    # suggest_dimension: products.category
+  }
+
+  parameter: category_param_wo_suggest_dimension {
+    type: string
+    suggest_persist_for: "1 minute"
+    # suggest_dimension: products.category
+  }
+
+  dimension: update_category_based_on_category_suggest_dim_param {
+    type: string
+    sql: {% parameter category_param_with_suggest_dimension %} ;;
   }
 
   dimension: dynamic_dimension {

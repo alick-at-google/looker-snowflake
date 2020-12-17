@@ -121,6 +121,12 @@ explore: order_items {
     sql_on: ${order_items.created_month} = ${running_total_derived_table.created_month} ;;
     relationship: many_to_one
   }
+
+  join: percent_rank_dt {
+    type: left_outer
+    sql_on: ${products.brand} = ${percent_rank_dt.brand} ;;
+    relationship: many_to_one
+  }
 }
 
 explore: products {

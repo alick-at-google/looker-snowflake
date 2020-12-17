@@ -26,6 +26,29 @@ view: order_items {
     type: number
   }
 
+  dimension: html_drill_test {
+    type: string
+    sql: 1=1 ;;
+    html: <a style="
+  color: #EA4335;
+    border: solid 1px #EA4335;
+    float: left;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    padding: 10px;
+    margin: 5px;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 5px;"
+ href="https://dcl.dev.looker.com/dashboards-next/856?Department+Test={{ _filters['products.department'] | url_encode }}" target="_blank">
+Day
+</a> ;;
+  }
+
+
   dimension: user_attribute_test {
     type: number
     sql: {{ _user_attributes['danielle_number_test'] }} ;;
@@ -76,20 +99,6 @@ view: order_items {
     sql_start: ${TABLE}.created_at ;;
     sql_end: ${TABLE}.returned_at ;;
   }
-
-  # measure: duration_50th_percentile {
-  #   type: percentile
-  #   percentile: 50
-  #   sql: ${seconds_time_between_created_and_returned_duration}  ;;
-  # }
-
-  # measure: duration_25th_percentile {
-  #   type: percentile
-  #   percentile: 25
-  #   sql: ${seconds_enquiry_process_duration}  ;;
-  # }
-
-
 
   dimension: created_test_date {
     type: date
@@ -292,6 +301,16 @@ view: order_items {
     {% endif %} ;;
   }
 
+  dimension: html_spacing_test_2 {
+    type: string
+    sql: 'here is some text' ;;
+    html: <p style="font-size:25px; text-align:center; font-weight: bold; padding: 10px">{{ order_items.status._value }}</p>
+          <p style="color: black; background-color: crimson; font-size:30px; text-align:center; padding: 10px">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
+          <p style="font-size:15px; text-align:center; padding: 10px">The Warehouse is available but not up to current date</p>
+          ;;
+  }
+
+
   dimension: sale_price {
     type: number
     sql: ${TABLE}."SALE_PRICE" ;;
@@ -349,20 +368,6 @@ view: order_items {
     sql: ${TABLE}."SHIPPED_AT" ;;
   }
 
-  dimension_group: shipped_datatype_timestamp {
-    type: time
-    datatype: timestamp
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}."SHIPPED_AT" ;;
-  }
 
   dimension: status {
     type: string
@@ -489,9 +494,14 @@ view: order_items {
 
   measure: average_sale_price {
     type: average
-    sql: ${sale_price}/100 ;;
-    value_format_name: percent_2
+    sql: ${sale_price} ;;
   }
+
+  # measure: average_sale_price_filtered_measure_1 {
+  #   type: average
+  #   sql: ${sale_price} ;;
+  #   filters: [percent_rank_dt.percentile_buckets: "1"]
+  # }
 
 
   measure: order_count_usd_value_format {
@@ -539,20 +549,6 @@ parameter: year_selector {
         END ;;
     value_format_name: usd_0
   }
-
-  # measure: dynamic_total_sale_price_by_year_filter {
-  #   type: number
-  #   sql:
-  #   {% condition year_selector_filter %} = '2016' THEN ${total_sale_price_2016}
-  #       WHEN {% parameter year_selector %} = '2017' THEN ${total_sale_price_2017}
-  #       WHEN {% parameter year_selector %} = '2018' THEN ${total_sale_price_2018}
-  #       WHEN {% parameter year_selector %} = '2019' THEN ${total_sale_price_2019}
-  #       WHEN {% parameter year_selector %} = '2020' THEN ${total_sale_price_2020}
-  #       ELSE NULL
-  #       END ;;
-  #   value_format_name: usd_0
-  # }
-
 
   filter: year_selector_filter {
     type: string
@@ -675,15 +671,6 @@ parameter: year_selector {
     type: number
     sql: 1.0*${total_sale_price}/nullif(${total_sale_price},${total_sale_price}+2) ;;
   }
-
-
-  # measure: ctr {
-  #   type: number
-  #   label: "CTR"
-  #   sql: COALESCE( SUM(${videoclicks}) * 1.00 / IFNULL( SUM(${adviews}), SUM(${videoclicks})) ,0) ;;
-  #   value_format: "0.0%"
-  #   drill_fields: [activity_month_month, custom_deal_type, modality, section, ctr]
-  # }
 
 
 ######## Rank test for CJ
