@@ -3,6 +3,7 @@ connection: "snowflakelooker"
 include: "/views/*.view.lkml"                # include all views in the views/ folder in this project
 # include: "/**/view.lkml"                   # include all views in this project
 include: "/*/alert_test_dashboard.dashboard"   # include a LookML dashboard called my_dashboard
+include: "/*/alert_test_dashboard_2.dashboard"   # include a LookML dashboard called my_dashboard
 
 include: "/new_folder/testing.view"
 
