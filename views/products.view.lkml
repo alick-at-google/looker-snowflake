@@ -76,6 +76,7 @@ view: products {
 
   parameter: category_param_with_suggest_dimension {
     type: string
+    suggest_persist_for: "1 minute"
     # suggest_dimension: products.category
   }
 
