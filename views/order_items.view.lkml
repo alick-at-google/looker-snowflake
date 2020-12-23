@@ -290,7 +290,7 @@ Day
     {% elsif order_items.status._value == 'Complete' %}
     <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
     <p style="color: black; background-color: crimson; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
-    <p style="font-size:15px; text-align:center">The Warehouse is available but not up to current date</p>
+    <p style="font-size:15px; text-align:center">The updated date is listed above</p>
     {% elsif order_items.status._value == 'Pending' %}
     <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
     <p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
@@ -304,11 +304,24 @@ Day
   dimension: html_spacing_test_2 {
     type: string
     sql: 'here is some text' ;;
-    html: <p style="font-size:25px; text-align:center; font-weight: bold; padding: 10px">{{ order_items.status._value }}</p>
-          <p style="color: black; background-color: crimson; font-size:30px; text-align:center; padding: 10px">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
-          <p style="font-size:15px; text-align:center; padding: 10px">The Warehouse is available but not up to current date</p>
-          ;;
+    # html: <p style="font-size:25px; text-align:center; font-weight: bold; padding: 1px">{{ order_items.status._value }}</p>
+    #       <p style="color: black; background-color: crimson; font-size:30px; text-align:center; padding: 1px">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
+    #       <p style="font-size:15px; text-align:center; padding: 1px">The Warehouse is available but not up to current date</p>
+    #       ;;
+    html: <p style="font-size:25px; text-align:center; font-weight: bold; line-height: 1.5">{{ order_items.status._value }}</p>
+    <p class="small" style="color: black; background-color: crimson; font-size:30px; text-align:center; line-height: 1.5">{{ rendered_value }}<br><span style="font-size:25px; line-height: 1.5">{{ order_items.created_date._value }}</span></p>
+    <p class="small" style="font-size:15px; text-align:center; line-height: 1.5">The updated date is listed above</p>
+    ;;
   }
+
+#   dimension: html_spacing_test_3 {
+#   type: string
+#   sql: 'here is some text' ;;
+#   html: <p class="small" style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
+#           <p class="small" style="color: black; background-color: crimson; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
+#           <p class="small" style="font-size:15px; text-align:center">The Warehouse is available but not up to current date</p>
+#           ;;
+# }
 
 
   dimension: sale_price {
@@ -422,6 +435,7 @@ Day
   dimension: sale_price_times_100 {
     type: number
     sql: ${TABLE}.sale_price * 100 ;;
+    value_format_name: decimal_2
     # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
   }
 
@@ -490,11 +504,13 @@ Day
   measure: percent_of_total_sale_price {
     type: percent_of_total
     sql: ${total_sale_price};;
+    value_format_name: percent_2
   }
 
   measure: average_sale_price {
     type: average
     sql: ${sale_price} ;;
+    value_format_name: usd
   }
 
   # measure: average_sale_price_filtered_measure_1 {
@@ -623,7 +639,7 @@ parameter: year_selector {
   measure: average_order_price {
     type: number
     sql: 1.0*${total_sale_price}/nullif(${count},0) ;;
-    # value_format_name: usd_0
+    value_format_name: decimal_0
   }
 
   measure: average_order_price_value_format {
