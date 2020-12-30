@@ -424,6 +424,7 @@ view: order_items {
   measure: count_complete {
     type: count
     filters: [status: "Complete"]
+    value_format_name: decimal_0
   }
 
   measure: total_sale_price {
