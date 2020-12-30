@@ -215,6 +215,34 @@ view: order_items {
     sql: ${TABLE}."DELIVERED_AT" ;;
   }
 
+  dimension_group: delivered_html_test {
+    type: time
+    timeframes: [
+      raw,
+      time,
+      time_of_day,
+      date,
+      day_of_week,
+      day_of_week_index,
+      week,
+      day_of_month,
+      month,
+      month_name,
+      quarter,
+      year
+    ]
+    sql: ${TABLE}."DELIVERED_AT" ;;
+    html: {% if delivered_html_test_day_of_week_index == 5 %} <font color="green">{{ value }}</font>
+    {% else %} {{value}}
+    {% endif %};;
+  }
+
+  dimension: concat_date_dimension_test {
+    type: string
+    sql: ${delivered_html_test_day_of_week} || ', ' || to_char(${delivered_html_test_day_of_month}) || ' ' || ${delivered_html_test_month_name} || ' ' || ${delivered_html_test_time_of_day} ;;
+    order_by_field: delivered_html_test_time
+  }
+
   dimension: inventory_item_id {
     type: number
     # hidden: yes
