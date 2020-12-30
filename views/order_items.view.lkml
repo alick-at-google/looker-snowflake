@@ -29,23 +29,8 @@ view: order_items {
   dimension: html_drill_test {
     type: string
     sql: 1=1 ;;
-    html: <a style="
-  color: #EA4335;
-    border: solid 1px #EA4335;
-    float: left;
-    font-weight: 400;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    user-select: none;
-    padding: 10px;
-    margin: 5px;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: 5px;"
- href="https://dcl.dev.looker.com/dashboards-next/856?Department+Test={{ _filters['products.department'] | url_encode }}" target="_blank">
-Day
-</a> ;;
+    html: <a style="color: #EA4335; border: solid 1px #EA4335; float: left; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; user-select: none; padding: 10px; margin: 5px;  font-size: 1rem; line-height: 1.5;  border-radius: 5px;"
+ href="https://dcl.dev.looker.com/dashboards-next/856?Department+Test={{ _filters['products.department'] | url_encode }}" target="_blank">Day</a> ;;
   }
 
 
@@ -69,29 +54,6 @@ Day
     sql: DATEDIFF(day, {% date_start create_test_date %}, {% date_end create_test_date %}) <= 45;;
   }
 
-  dimension_group: create_test {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      time_of_day,
-      hour_of_day,
-      date,
-      day_of_week,
-      day_of_week_index,
-      week,
-      week_of_year,
-      month,
-      month_name,
-      month_num,
-      day_of_month,
-      quarter,
-      year
-    ]
-    # sql: {% condition date_filter_1 %} ${TABLE}.created_at {% endcondition %};;
-    sql: ${TABLE}.created_at ;;
-  }
-
   dimension_group: time_between_created_and_returned {
     type: duration
     intervals: [second, minute, hour, day, week]
@@ -100,9 +62,9 @@ Day
     sql_end: ${TABLE}.returned_at ;;
   }
 
-  dimension: created_test_date {
+  dimension: create_test_date {
     type: date
-    sql: ${create_test_date};;
+    sql: ${created_date} ;;
   }
 
   dimension: current_date {
@@ -184,9 +146,7 @@ Day
     filters: [is_big_order: "false"]
   }
 
-
-  dimension: status_case_when {
-    type: string
+  dimension: status_lookml_case_when {
     case: {
       when: {
         label: "Complete"
@@ -283,45 +243,20 @@ Day
   dimension: html_spacing_test {
     type: string
     sql: 'here is some text' ;;
-    html: {% if order_items.status._value == 'Cancelled' %}
+    html:
 <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
 <p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}</p>
-<p style="font-size:15px; text-align:center">The Warehouse load has not yet competed<br>Looks or Dashboards using this Wareouse<br>will not yet return data</p>
-    {% elsif order_items.status._value == 'Complete' %}
-    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
-    <p style="color: black; background-color: crimson; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
-    <p style="font-size:15px; text-align:center">The updated date is listed above</p>
-    {% elsif order_items.status._value == 'Pending' %}
-    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
-    <p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
-    <p style="font-size:15px; text-align:center">The Warehouse is available but not all staging<br>tables are up to date</p>
-    {% else %}
-    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
-    <p style="color: black; background-color: white; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:30px">{{ order_items.created_date._value }}</span></p>
-    {% endif %} ;;
+<p style="font-size:15px; text-align:center">The Warehouse load has not yet competed<br>Looks or Dashboards using this Wareouse<br>will not yet return data</p> ;;
   }
 
   dimension: html_spacing_test_2 {
     type: string
     sql: 'here is some text' ;;
-    # html: <p style="font-size:25px; text-align:center; font-weight: bold; padding: 1px">{{ order_items.status._value }}</p>
-    #       <p style="color: black; background-color: crimson; font-size:30px; text-align:center; padding: 1px">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
-    #       <p style="font-size:15px; text-align:center; padding: 1px">The Warehouse is available but not up to current date</p>
-    #       ;;
     html: <p style="font-size:25px; text-align:center; font-weight: bold; line-height: 1.5">{{ order_items.status._value }}</p>
     <p class="small" style="color: black; background-color: crimson; font-size:30px; text-align:center; line-height: 1.5">{{ rendered_value }}<br><span style="font-size:25px; line-height: 1.5">{{ order_items.created_date._value }}</span></p>
     <p class="small" style="font-size:15px; text-align:center; line-height: 1.5">The updated date is listed above</p>
     ;;
   }
-
-#   dimension: html_spacing_test_3 {
-#   type: string
-#   sql: 'here is some text' ;;
-#   html: <p class="small" style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
-#           <p class="small" style="color: black; background-color: crimson; font-size:30px; text-align:center">{{ rendered_value }}<br><span style="font-size:25px">{{ order_items.created_date._value }}</span></p>
-#           <p class="small" style="font-size:15px; text-align:center">The Warehouse is available but not up to current date</p>
-#           ;;
-# }
 
 
   dimension: sale_price {
@@ -443,7 +378,6 @@ Day
     type: number
     sql: ${TABLE}.sale_price * -10 ;;
     value_format_name: decimal_2
-    # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
   }
 
   dimension: sale_price_manual_tiers {
@@ -477,6 +411,13 @@ Day
 
   measure: count {
     type: count
+    drill_fields: [detail*]
+  }
+
+  measure: day_over_day_percent_change {
+    type: number
+    sql: COALESCE(((${count}-${previous_day_with_lead_function_dt.previous_days_count})/${previous_day_with_lead_function_dt.previous_days_count}),0) ;;
+    value_format_name: percent_2
     drill_fields: [detail*]
   }
 

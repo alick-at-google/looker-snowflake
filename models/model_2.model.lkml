@@ -128,6 +128,12 @@ explore: order_items {
     sql_on: ${products.brand} = ${percent_rank_dt.brand} ;;
     relationship: many_to_one
   }
+
+  join: previous_day_with_lead_function_dt {
+    type: inner
+    sql_on: ${order_items.created_date} = ${previous_day_with_lead_function_dt.date} ;;
+    relationship: many_to_one
+  }
 }
 
 explore: products {
