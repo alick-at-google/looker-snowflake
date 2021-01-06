@@ -72,6 +72,11 @@ view: order_items {
     sql: current_date();;
   }
 
+  dimension: current_time {
+    type: date_time
+    sql: current_timestamp();;
+  }
+
   measure: total_sale_price_2020_test {
     # group_label: "Total Sale Price - Specific Years"
     label: "total sale price for {{ order_items.current_date._value }}"
