@@ -3,6 +3,8 @@ view: order_items {
     ;;
   drill_fields: [id]
 
+#hi
+
   dimension: status2 {
     type: string
     sql: case when ${TABLE}."STATUS" is null then 'static string' else ${TABLE}."STATUS" end;;
