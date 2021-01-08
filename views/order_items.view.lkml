@@ -197,6 +197,7 @@ view: order_items {
       week,
       month,
       month_name,
+      month_num,
       quarter,
       year
     ]
@@ -297,7 +298,6 @@ view: order_items {
   dimension: sale_price {
     type: number
     sql: ${TABLE}."SALE_PRICE" ;;
-    # value_format_name: id
   }
 
   dimension: sale_price_tiers {
@@ -309,9 +309,7 @@ view: order_items {
 
   dimension: sale_price_value_format_id_type {
     type: string
-    # sql: ${TABLE}."SALE_PRICE"*1234567898765000;;
     sql: CONCAT('\'',${TABLE}."SALE_PRICE"*12345678987650000::VARCHAR);;
-    # sql: CONCAT('\'',${TABLE}."SALE_PRICE"*12345678987650000);;
     value_format: "id"
   }
 
@@ -385,7 +383,7 @@ view: order_items {
 
   dimension: user_id {
     type: number
-    # hidden: yes
+    hidden: yes
     sql: ${TABLE}."USER_ID" ;;
   }
 
