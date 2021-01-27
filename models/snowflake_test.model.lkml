@@ -3,6 +3,10 @@ connection: "snowflakelooker"
 # include all the views
 include: "/views/**/*.view"
 
+map_layer: es_municipalities {
+  url: "https://unpkg.com/es-atlas@0.2.0/es/municipalities.json"
+}
+
 datagroup: snowflake_test_default_datagroup {
   sql_trigger: SELECT current_date() ;;
   max_cache_age: "1 hour"

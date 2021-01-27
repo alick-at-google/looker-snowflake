@@ -194,7 +194,9 @@ view: order_items {
       raw,
       time,
       date,
+      day_of_week_index,
       week,
+      week_of_year,
       month,
       month_name,
       month_num,
@@ -205,8 +207,28 @@ view: order_items {
   }
 
   dimension: year {
-    type: string
-    sql: ${created_year} ;;
+    # type: string
+    type: number
+    sql: TO_NUMBER(${created_year}) ;;
+    # datatype: date
+  }
+
+  dimension: week_of_year {
+    type: number
+    sql: TO_NUMBER(${created_week_of_year}) ;;
+  }
+
+  dimension: date {
+    type: date
+    sql: ${delivered_date} ;;
+    # sql:${TABLE}."CREATED_AT";;
+    # required_fields: [order_items.year,order_items.week_of_year]
+  }
+
+  dimension_group: test {
+    type: time
+    datatype: date
+    sql: rl.iso_week_date(${year}, ${week_of_year});;
   }
 
   dimension_group: delivered {
@@ -221,6 +243,7 @@ view: order_items {
       year
     ]
     sql: ${TABLE}."DELIVERED_AT" ;;
+    convert_tz: no
   }
 
   dimension_group: delivered_html_test {
@@ -554,6 +577,11 @@ parameter: year_selector {
     filters: [created_year: "2020"]
   }
 
+  measure: total_sale_price_2020_number {
+    type: number
+    sql: case when ${total_sale_price_2020} > 0 then ${total_sale_price_2020} else null end ;;
+  }
+
   measure: total_sale_price_2019 {
     group_label: "Total Sale Price - Specific Years"
     type: sum
@@ -612,10 +640,23 @@ parameter: year_selector {
   }
 
   measure: average_order_price {
-    type: number
-    sql: 1.0*${total_sale_price}/nullif(${count},0) ;;
+    type: average
+    sql: ${sale_price} ;;
     value_format_name: decimal_0
+    link: {
+      label: "See Labor Detail"
+      url: "/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name&f[order_items.is_big_order]=Yes&f[order_items.created_date]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
   }
+  }
+
+  ######## example reported in bug #########
+
+#   link: {
+#     label: "See Labor Detail"
+#     url: "/explore/dw/jcdetail_all?fields=jcdetail_all.effective_date,employee_info.teammate_number,employee_info.first_name,employee_info.last_name,jcdetail_reference.class,jcdetail_all.quantity,hqunits_of_measure.unit_of_measure,jctask.task_name,jctask.task_description,jcdetail_all.total_labor&f[jccost_types.cost_type_group_description]=Labor&f[jcjob.master_project_number]={{ _filters['jcjob.master_project_number'] }}&f[effectivedate.data_as_of]={{ _filters['effectivedate.data_as_of'] }}&f[jcdetail_all.is_trans_type_cost]=Yes&sorts=jcdetail_all.effective_date" }
+# }
+
+
 
   measure: average_order_price_value_format {
     type: average
@@ -624,6 +665,7 @@ parameter: year_selector {
   }
 
   measure: average_order_price_2019 {
+    description: "measure of type number with division"
     type: number
     sql: 1.0*${total_sale_price_2019}/nullif(${count_orders_2019},0) ;;
     value_format_name: usd_0

@@ -9,6 +9,11 @@ include: "/new_folder/testing.view"
 
 include: "/snowflake_test/*.view"
 
+# map_layer: us_municipalities {
+#   url: "https://unpkg.com/es-atlas@0.2.0/es/municipalities.json"
+# }
+
+
 # explore: order_items {
 #   join: products {
 #     relationship: many_to_one
@@ -68,6 +73,7 @@ explore: tiers_on_measure {
 # cancel_grouping_fields: [users.state,users.city]
 
 explore: order_items {
+  sql_always_where: ${order_items.is_big_order} ;;
 
   # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
   # {% condition products.category_parameter %} products.category {% endcondition %} AND
@@ -143,6 +149,38 @@ explore: products {
     relationship: many_to_one
   }
 }
+
+
+explore: +order_items {
+  aggregate_table: rollup__created_date__products_brand__products_category__products_department__users_age__users_city__users_country__users_first_name__users_gender__users_id__users_last_name__users_state {
+    query: {
+      dimensions: [
+        created_date,
+        products.brand,
+        products.category,
+        products.department,
+        users.age,
+        users.city,
+        users.country,
+        users.first_name,
+        users.gender,
+        users.id,
+        users.last_name,
+        users.state
+      ]
+      measures: [average_sale_price, count, products.count, total_sale_price, users.count]
+      filters: [
+        order_items.created_date: "7 days",
+        users.country: "USA"
+      ]
+    }
+
+    materialization: {
+      persist_for: "24 hours"
+    }
+  }
+}
+
 
 
 

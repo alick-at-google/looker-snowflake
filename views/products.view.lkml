@@ -77,7 +77,7 @@ view: products {
   parameter: category_param_with_suggest_dimension {
     type: string
     suggest_persist_for: "1 minute"
-    # suggest_dimension: products.category
+    suggest_dimension: products.category
   }
 
   parameter: category_param_wo_suggest_dimension {
@@ -103,6 +103,12 @@ view: products {
     {% elsif dimension_picker._parameter_value == "'-'" %}
        '-'
     {% endif %} ;;
+  }
+
+
+  dimension: brands_to_filter {
+    type: yesno
+    sql: ${brand} ILIKE ANY ('%blue%' , '%jeans%' , '%design%' , '%boutique%', '%big%') ;;
   }
 
   dimension: brand {
