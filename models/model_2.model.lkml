@@ -73,7 +73,7 @@ explore: tiers_on_measure {
 # cancel_grouping_fields: [users.state,users.city]
 
 explore: order_items {
-  sql_always_where: ${order_items.is_big_order} ;;
+  # sql_always_where: ${order_items.is_big_order} ;;
 
   # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
   # {% condition products.category_parameter %} products.category {% endcondition %} AND
