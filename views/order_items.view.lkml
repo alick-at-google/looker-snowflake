@@ -757,10 +757,10 @@ parameter: year_selector {
 
 ##### Aggregate table test using measures of type: number
 
-  measure: sum_sale_price_type_number {
-    type: number
-    sql: sum(${sale_price}) ;;
-  }
+  # measure: sum_sale_price_type_number {
+  #   type: number
+  #   sql: sum(${sale_price}) ;;
+  # }
 
   measure: max_sale_price_type_number {
     type: number

@@ -157,7 +157,9 @@ explore: inventory_items {
   symmetric_aggregates: no
   join: order_items {
     type: left_outer
-    relationship: many_to_many
+    # relationship: many_to_many
+    relationship: many_to_one
+    # relationship: one_to_many
     sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
   }
 }
