@@ -119,6 +119,7 @@ view: products {
   dimension: category {
     type: string
     sql: ${TABLE}."CATEGORY" ;;
+    # order_by_field: products.count
   }
 
 
@@ -183,6 +184,11 @@ view: products {
     type: count
     drill_fields: [id, name, distribution_centers.name, distribution_centers.id, inventory_items.count]
     value_format_name: decimal_0
+  }
+
+  measure: median_test {
+    type: median
+    sql: ${cost} ;;
   }
 
   measure: group_concat_category {

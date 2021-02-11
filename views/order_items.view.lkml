@@ -5,6 +5,72 @@ view: order_items {
 
 #hi
 
+
+#########
+
+parameter: number_selection {
+  group_label: "parameterizing date dimension"
+  type: number
+}
+
+parameter: timeframe_selection {
+  group_label: "parameterizing date dimension"
+  type: string
+  allowed_value: { label: "Day" value: "day" }
+  allowed_value: { label: "Week" value: "week" }
+  allowed_value: { label: "Quarter" value: "quarter" }
+  allowed_value: { label: "Month" value: "month" }
+}
+
+dimension: parameterized_date_field {
+  group_label: "parameterizing date dimension"
+type: date
+# sql: CASE
+#       WHEN {% parameter timeframe_selection %} = 'day' AND ${created_date} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()))
+#       THEN ${created_date}
+#       ELSE NULL
+#       END ;;
+
+  sql: CASE WHEN
+  ${created_date} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()))
+  THEN ${created_date}
+  ELSE NULL
+  END ;;
+}
+
+dimension: parameterized_date_field_yesno {
+  group_label: "parameterizing date dimension"
+  description: "filter this for yes in the query or in a sql_always_where and then we can pull in any of our created_date timeframes that will be governed by our parameter filter selections"
+  type: yesno
+  sql: ${created_date} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()));;
+}
+
+dimension: timeframe_selection_value {
+  group_label: "parameterizing date dimension"
+  type: string
+  sql: {{ timeframe_selection._parameter_value }} ;;
+}
+
+dimension: number_selection_value {
+  group_label: "parameterizing date dimension"
+  type: number
+  sql: -1*( {{ number_selection._parameter_value}} - 1) ;;
+}
+
+dimension: date_trunc_value {
+  group_label: "parameterizing date dimension"
+  type: date
+  sql: DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()) ;;
+}
+
+dimension: the_whole_thing {
+  group_label: "parameterizing date dimension"
+  type: yesno
+  sql:${created_raw} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP())) ;;
+}
+
+############################################## end parameterized date dimension test
+
   dimension: status2 {
     type: string
     sql: case when ${TABLE}."STATUS" is null then 'static string' else ${TABLE}."STATUS" end;;
@@ -28,12 +94,13 @@ view: order_items {
     type: number
   }
 
-  dimension: html_drill_test {
-    type: string
-    sql: 1=1 ;;
-    html: <a style="color: #EA4335; border: solid 1px #EA4335; float: left; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; user-select: none; padding: 10px; margin: 5px;  font-size: 1rem; line-height: 1.5;  border-radius: 5px;"
- href="https://dcl.dev.looker.com/dashboards-next/856?Department+Test={{ _filters['products.department'] | url_encode }}" target="_blank">Day</a> ;;
-  }
+#   dimension: html_drill_test {
+#     group_label: "html testing"
+#     type: string
+#     sql: 1=1 ;;
+#     html: <a style="color: #EA4335; border: solid 1px #EA4335; float: left; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; user-select: none; padding: 10px; margin: 5px;  font-size: 1rem; line-height: 1.5;  border-radius: 5px;"
+# href="https://dcl.dev.looker.com/dashboards-next/856?Department+Test={{ _filters['products.department'] | url_encode }}" target="_blank">Day</a> ;;
+#   }
 
 
   dimension: user_attribute_test {
@@ -70,11 +137,13 @@ view: order_items {
   }
 
   dimension: current_date {
+    group_label: "Current Date"
     type: date
     sql: current_date();;
   }
 
   dimension: current_time {
+    group_label: "Current Date"
     type: date_time
     sql: current_timestamp();;
   }
@@ -98,12 +167,14 @@ view: order_items {
 
   ###### HTML IMAGES ###########
   dimension: aon_logo {
+    group_label: "html testing"
     type: string
     sql: 1 ;;
     html: <img src="https://cdn.filestackcontent.com/fMVx1x2rQb5oHLv0QA4l" height=60% width=60% /> ;;
   }
 
   dimension: aon_logo_div_tags {
+    group_label: "html testing"
     type: string
     sql: 1 ;;
     html: <div class="single-value"><img src="https://cdn.filestackcontent.com/fMVx1x2rQb5oHLv0QA4l" height=60% width=60% /> </div> ;;
@@ -112,6 +183,7 @@ view: order_items {
   ##########
 
   parameter: is_large_order {
+    description: "parameter of type number"
     type: number
     allowed_value: {
       label: "Yes"
@@ -182,6 +254,8 @@ view: order_items {
     }
   }
 
+###############################################################
+
   dimension: id {
     primary_key: yes
     type: number
@@ -225,12 +299,6 @@ view: order_items {
     # required_fields: [order_items.year,order_items.week_of_year]
   }
 
-  dimension_group: test {
-    type: time
-    datatype: date
-    sql: rl.iso_week_date(${year}, ${week_of_year});;
-  }
-
   dimension_group: delivered {
     type: time
     timeframes: [
@@ -247,6 +315,7 @@ view: order_items {
   }
 
   dimension_group: delivered_html_test {
+    group_label: "html testing"
     type: time
     timeframes: [
       raw,
@@ -276,7 +345,7 @@ view: order_items {
 
   dimension: inventory_item_id {
     type: number
-    # hidden: yes
+    hidden: yes
     sql: ${TABLE}."INVENTORY_ITEM_ID" ;;
   }
 
@@ -300,6 +369,7 @@ view: order_items {
   }
 
   dimension: html_spacing_test {
+    group_label: "html testing"
     type: string
     sql: 'here is some text' ;;
     html:
@@ -309,6 +379,7 @@ view: order_items {
   }
 
   dimension: html_spacing_test_2 {
+    group_label: "html testing"
     type: string
     sql: 'here is some text' ;;
     html: <p style="font-size:25px; text-align:center; font-weight: bold; line-height: 1.5">{{ order_items.status._value }}</p>
@@ -470,12 +541,18 @@ view: order_items {
     drill_fields: [detail*]
   }
 
-  measure: day_over_day_percent_change {
-    type: number
-    sql: COALESCE(((${count}-${previous_day_with_lead_function_dt.previous_days_count})/${previous_day_with_lead_function_dt.previous_days_count}),0) ;;
-    value_format_name: percent_2
-    drill_fields: [detail*]
+  measure: percentile_75_test {
+    type: percentile
+    percentile: 75
+    sql: ${sale_price} ;;
   }
+
+  # measure: day_over_day_percent_change {
+  #   type: number
+  #   sql: COALESCE(((${count}-${previous_day_with_lead_function_dt.previous_days_count})/${previous_day_with_lead_function_dt.previous_days_count}),0) ;;
+  #   value_format_name: percent_2
+  #   drill_fields: [detail*]
+  # }
 
   measure: count_complete {
     type: count
@@ -578,6 +655,7 @@ parameter: year_selector {
   }
 
   measure: total_sale_price_2020_number {
+    group_label: "Total Sale Price - Specific Years"
     type: number
     sql: case when ${total_sale_price_2020} > 0 then ${total_sale_price_2020} else null end ;;
   }
@@ -633,11 +711,11 @@ parameter: year_selector {
     value_format_name: percent_2
   }
 
-  measure: total_users_over_total_orders {
-    type: number
-    sql: ${users.count}/nullif(${count},0) ;;
-    value_format_name: percent_2
-  }
+  # measure: total_users_over_total_orders {
+  #   type: number
+  #   sql: ${users.count}/nullif(${count},0) ;;
+  #   value_format_name: percent_2
+  # }
 
   measure: average_order_price {
     type: average

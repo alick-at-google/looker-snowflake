@@ -73,6 +73,7 @@ explore: tiers_on_measure {
 # cancel_grouping_fields: [users.state,users.city]
 
 explore: order_items {
+  symmetric_aggregates: no
   # sql_always_where: ${order_items.is_big_order} ;;
 
   # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
@@ -85,7 +86,6 @@ explore: order_items {
 #   field: order_items.status
 #   user_attribute: status
 # }
-
 
   join: users {
     type: left_outer
@@ -102,7 +102,7 @@ explore: order_items {
   join: products {
     type: left_outer
     sql_on: ${inventory_items.product_id} = ${products.id} ;;
-    relationship: many_to_one
+    relationship: one_to_many
   }
 
   join: distribution_centers {
@@ -142,7 +142,9 @@ explore: order_items {
   }
 }
 
+
 explore: products {
+  symmetric_aggregates: no
   join: distribution_centers {
     type: left_outer
     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
@@ -150,6 +152,15 @@ explore: products {
   }
 }
 
+
+explore: inventory_items {
+  symmetric_aggregates: no
+  join: order_items {
+    type: left_outer
+    relationship: many_to_many
+    sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
+  }
+}
 
 explore: +order_items {
   aggregate_table: rollup__created_date__products_brand__products_category__products_department__users_age__users_city__users_country__users_first_name__users_gender__users_id__users_last_name__users_state {
