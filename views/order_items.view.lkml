@@ -3,9 +3,6 @@ view: order_items {
     ;;
   drill_fields: [id]
 
-#hi
-
-
 #########
 
 parameter: number_selection {
@@ -202,6 +199,11 @@ dimension: the_whole_thing {
   dimension: is_big_order {
     type: yesno
     sql: ${sale_price}>=200 ;;
+  }
+
+  dimension: string_test{
+    type: string
+    sql: case when ${is_big_order} then 'Big' else 'Small' end ;;
   }
 
   dimension: large_order_flag {
@@ -560,6 +562,16 @@ dimension: the_whole_thing {
     value_format_name: decimal_0
   }
 
+  dimension: within_date_range {
+    type: yesno
+    sql: ${shipped_date} > ${created_date} ;;
+  }
+
+  measure: count_within_date_range {
+    type: count
+    filters: [within_date_range: "yes"]
+  }
+
   measure: total_sale_price {
     type: sum
     sql: ${sale_price} ;;
@@ -717,15 +729,34 @@ parameter: year_selector {
   #   value_format_name: percent_2
   # }
 
-  measure: average_order_price {
-    type: average
-    sql: ${sale_price} ;;
-    value_format_name: decimal_0
-    link: {
-      label: "See Labor Detail"
-      url: "/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name&f[order_items.is_big_order]=Yes&f[order_items.created_date]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
-  }
-  }
+###### Drill Test ########
+  # measure: average_order_price {
+  #   type: average
+  #   sql: ${sale_price} ;;
+  #   value_format_name: decimal_0
+  #   link: {
+  #     label: "Drill Details"
+  #     url: "/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name&f[order_items.is_big_order]=Yes&f[order_items.created_date]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
+  # }
+  # }
+
+  # measure: drill_test_measure {
+  #   type: average
+  #   sql: ${sale_price} ;;
+  #   value_format_name: decimal_0
+  #   link: {
+  #     label: "Drill Details"
+  #     url: "{{drill_fields_dummy_measure._link}}&f[order_items.is_big_order]=Yes&f[order_items.created_quarter]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
+  #   }
+  # }
+
+  # measure: drill_fields_dummy_measure {
+  #   type: number
+  #   sql: 1 ;;
+  #   drill_fields: [order_items.count,order_items.created_date,users.first_name,users.last_name]
+  # }
+
+  ######## Drill Test ##########
 
   ######## example reported in bug #########
 

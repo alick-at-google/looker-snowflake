@@ -64,6 +64,22 @@ view: inventory_items {
     sql: ${TABLE}."PRODUCT_RETAIL_PRICE" ;;
   }
 
+  dimension: retail_price_with_case_when {
+    type: string
+    sql: case when ${product_retail_price} < 5 then null else to_varchar(${product_retail_price}) end ;;
+    # html:
+    # {% if retail_price_with_case_when %}
+    # {{ rendered_value }}
+    # {% else %}
+    # {% endif %} ;;
+  }
+
+  dimension: show_nulls_as_blanks {
+    type: string
+    sql: case when ${retail_price_with_case_when} is null then '' else to_varchar(${retail_price_with_case_when}) end ;;
+  }
+
+
   dimension: product_sku {
     type: string
     sql: ${TABLE}."PRODUCT_SKU" ;;
@@ -90,6 +106,13 @@ view: inventory_items {
 
   measure: total_retail_price {
     type: sum
+    sql: ${product_retail_price} ;;
+    value_format: "#,##0.00"
+  }
+
+  measure: percentile_25 {
+    type: percentile
+    percentile: 25
     sql: ${product_retail_price} ;;
   }
 }

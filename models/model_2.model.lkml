@@ -21,13 +21,6 @@ include: "/snowflake_test/*.view"
 #   }
 # }
 
-view: +order_items {
-  dimension: new_dimension_test {
-    type: string
-    sql: 'new dimension' ;;
-  }
-}
-
 datagroup: snowflake_test_default_datagroup {
   sql_trigger: SELECT current_date() ;;
   max_cache_age: "1 hour"
@@ -45,35 +38,8 @@ explore: tiers_on_measure {
   cancel_grouping_fields: []
 }
 
-# explore: order_items {
-# }
-
-# Place in `model_2` model
-# explore: +order_items {
-#   aggregate_table: rollup__created_date__sale_price__status {
-#     query: {
-#       dimensions: [created_date, sale_price, status]
-#       # measures: [sum_sale_price_type_number]
-#       measures: [reference_sums_and_divide]
-#       timezone: "America/Los_Angeles"
-#     }
-
-#     materialization: {
-#       persist_for: "5 minutes"
-#     }
-#   }
-# }
-
-
-  # access_filter: {
-  #   field: products.category
-  #   user_attribute: categories_test
-  # }
-
-# cancel_grouping_fields: [users.state,users.city]
-
 explore: order_items {
-  symmetric_aggregates: no
+  symmetric_aggregates:  no
   # sql_always_where: ${order_items.is_big_order} ;;
 
   # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
@@ -144,7 +110,6 @@ explore: order_items {
 
 
 explore: products {
-  symmetric_aggregates: no
   join: distribution_centers {
     type: left_outer
     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
@@ -157,9 +122,8 @@ explore: inventory_items {
   symmetric_aggregates: no
   join: order_items {
     type: left_outer
-    # relationship: many_to_many
-    relationship: many_to_one
-    # relationship: one_to_many
+    # relationship: many_to_one
+    relationship: one_to_many
     sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
   }
 }
@@ -194,7 +158,38 @@ explore: +order_items {
   }
 }
 
+view: +order_items {
+  dimension: new_dimension_test {
+    type: string
+    sql: 'new dimension' ;;
+  }
+}
 
+
+
+# Place in `model_2` model
+# explore: +order_items {
+#   aggregate_table: rollup__created_date__sale_price__status {
+#     query: {
+#       dimensions: [created_date, sale_price, status]
+#       # measures: [sum_sale_price_type_number]
+#       measures: [reference_sums_and_divide]
+#       timezone: "America/Los_Angeles"
+#     }
+
+#     materialization: {
+#       persist_for: "5 minutes"
+#     }
+#   }
+# }
+
+
+  # access_filter: {
+  #   field: products.category
+  #   user_attribute: categories_test
+  # }
+
+# cancel_grouping_fields: [users.state,users.city]
 
 
 ##### Customer's agg table
