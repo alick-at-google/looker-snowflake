@@ -1,9 +1,13 @@
 view: order_items {
   sql_table_name: "PUBLIC"."ORDER_ITEMS"
     ;;
-  drill_fields: [id]
+  # drill_fields: [id]
 
 #########
+
+parameter: data_as_of {
+  type:  date
+}
 
 parameter: number_selection {
   group_label: "parameterizing date dimension"
@@ -22,12 +26,6 @@ parameter: timeframe_selection {
 dimension: parameterized_date_field {
   group_label: "parameterizing date dimension"
 type: date
-# sql: CASE
-#       WHEN {% parameter timeframe_selection %} = 'day' AND ${created_date} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()))
-#       THEN ${created_date}
-#       ELSE NULL
-#       END ;;
-
   sql: CASE WHEN
   ${created_date} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()))
   THEN ${created_date}
@@ -42,46 +40,12 @@ dimension: parameterized_date_field_yesno {
   sql: ${created_date} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()));;
 }
 
-dimension: timeframe_selection_value {
-  group_label: "parameterizing date dimension"
-  type: string
-  sql: {{ timeframe_selection._parameter_value }} ;;
-}
-
-dimension: number_selection_value {
-  group_label: "parameterizing date dimension"
-  type: number
-  sql: -1*( {{ number_selection._parameter_value}} - 1) ;;
-}
-
-dimension: date_trunc_value {
-  group_label: "parameterizing date dimension"
-  type: date
-  sql: DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP()) ;;
-}
-
-dimension: the_whole_thing {
-  group_label: "parameterizing date dimension"
-  type: yesno
-  sql:${created_raw} >= DATEADD({{ timeframe_selection._parameter_value }}, -1*( {{ number_selection._parameter_value}} - 1), DATE_TRUNC({{ timeframe_selection._parameter_value }}, CURRENT_TIMESTAMP())) ;;
-}
-
 ############################################## end parameterized date dimension test
 
   dimension: status2 {
     type: string
     sql: case when ${TABLE}."STATUS" is null then 'static string' else ${TABLE}."STATUS" end;;
 }
-
-  dimension: status_total {
-    type: string
-    sql: 'Total' ;;
-  }
-
-  measure: static_value {
-    type: number
-    sql: 2500 ;;
-  }
 
   filter: date_filter_1 {
     type: date
@@ -154,14 +118,6 @@ dimension: the_whole_thing {
     filters: [created_year: "2020"]
   }
 
-
-  ######################
-
-  filter: custom_date_sql_filter {
-    type: date
-    # sql: SELECT ${TABLE.created_raw} where  ;;
-  }
-
   ###### HTML IMAGES ###########
   dimension: aon_logo {
     group_label: "html testing"
@@ -175,6 +131,26 @@ dimension: the_whole_thing {
     type: string
     sql: 1 ;;
     html: <div class="single-value"><img src="https://cdn.filestackcontent.com/fMVx1x2rQb5oHLv0QA4l" height=60% width=60% /> </div> ;;
+  }
+
+  dimension: html_spacing_test {
+    group_label: "html testing"
+    type: string
+    sql: 'here is some text' ;;
+    html:
+    <p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
+    <p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}</p>
+    <p style="font-size:15px; text-align:center">The Warehouse load has not yet competed<br>Looks or Dashboards using this Wareouse<br>will not yet return data</p> ;;
+  }
+
+  dimension: html_spacing_test_2 {
+    group_label: "html testing"
+    type: string
+    sql: 'here is some text' ;;
+    html: <p style="font-size:25px; text-align:center; font-weight: bold; line-height: 1.5">{{ order_items.status._value }}</p>
+          <p class="small" style="color: black; background-color: crimson; font-size:30px; text-align:center; line-height: 1.5">{{ rendered_value }}<br><span style="font-size:25px; line-height: 1.5">{{ order_items.created_date._value }}</span></p>
+          <p class="small" style="font-size:15px; text-align:center; line-height: 1.5">The updated date is listed above</p>
+          ;;
   }
 
   ##########
@@ -201,7 +177,7 @@ dimension: the_whole_thing {
     sql: ${sale_price}>=200 ;;
   }
 
-  dimension: string_test{
+  dimension: string_test  {
     type: string
     sql: case when ${is_big_order} then 'Big' else 'Small' end ;;
   }
@@ -295,29 +271,14 @@ dimension: the_whole_thing {
   }
 
   dimension: date {
-    type: date
+  description: "delivered date"
+   type: date
     sql: ${delivered_date} ;;
     # sql:${TABLE}."CREATED_AT";;
     # required_fields: [order_items.year,order_items.week_of_year]
   }
 
   dimension_group: delivered {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}."DELIVERED_AT" ;;
-    convert_tz: no
-  }
-
-  dimension_group: delivered_html_test {
-    group_label: "html testing"
     type: time
     timeframes: [
       raw,
@@ -334,15 +295,16 @@ dimension: the_whole_thing {
       year
     ]
     sql: ${TABLE}."DELIVERED_AT" ;;
-    html: {% if delivered_html_test_day_of_week_index == 5 %} <font color="green">{{ value }}</font>
-    {% else %} {{value}}
-    {% endif %};;
+    # convert_tz: no
+    # html: {% if delivered_html_test_day_of_week_index == 5 %} <font color="green">{{ value }}</font>
+    # {% else %} {{value}}
+    # {% endif %};;
   }
 
   dimension: concat_date_dimension_test {
     type: string
-    sql: ${delivered_html_test_day_of_week} || ', ' || to_char(${delivered_html_test_day_of_month}) || ' ' || ${delivered_html_test_month_name} || ' ' || ${delivered_html_test_time_of_day} ;;
-    order_by_field: delivered_html_test_time
+    sql: ${delivered_day_of_week} || ', ' || to_char(${delivered_day_of_month}) || ' ' || ${delivered_month_name} || ' ' || ${delivered_time_of_day} ;;
+    order_by_field: delivered_time
   }
 
   dimension: inventory_item_id {
@@ -369,27 +331,6 @@ dimension: the_whole_thing {
     ]
     sql: ${TABLE}."RETURNED_AT" ;;
   }
-
-  dimension: html_spacing_test {
-    group_label: "html testing"
-    type: string
-    sql: 'here is some text' ;;
-    html:
-<p style="font-size:25px; text-align:center; font-weight: bold">{{ order_items.status._value }}</p>
-<p style="color: black; background-color: gold; font-size:30px; text-align:center">{{ rendered_value }}</p>
-<p style="font-size:15px; text-align:center">The Warehouse load has not yet competed<br>Looks or Dashboards using this Wareouse<br>will not yet return data</p> ;;
-  }
-
-  dimension: html_spacing_test_2 {
-    group_label: "html testing"
-    type: string
-    sql: 'here is some text' ;;
-    html: <p style="font-size:25px; text-align:center; font-weight: bold; line-height: 1.5">{{ order_items.status._value }}</p>
-    <p class="small" style="color: black; background-color: crimson; font-size:30px; text-align:center; line-height: 1.5">{{ rendered_value }}<br><span style="font-size:25px; line-height: 1.5">{{ order_items.created_date._value }}</span></p>
-    <p class="small" style="font-size:15px; text-align:center; line-height: 1.5">The updated date is listed above</p>
-    ;;
-  }
-
 
   dimension: sale_price {
     type: number
@@ -418,6 +359,7 @@ dimension: the_whole_thing {
 
   dimension_group: shipped {
     type: time
+    # datatype: datetime
     timeframes: [
       raw,
       time,
@@ -429,22 +371,6 @@ dimension: the_whole_thing {
     ]
     sql: ${TABLE}."SHIPPED_AT" ;;
   }
-
-  dimension_group: shipped_datatype_datetime {
-    type: time
-    datatype: datetime
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}."SHIPPED_AT" ;;
-  }
-
 
   dimension: status {
     type: string
@@ -481,12 +407,6 @@ dimension: the_whole_thing {
     type: number
     hidden: yes
     sql: ${TABLE}."USER_ID" ;;
-  }
-
-  dimension: url {
-    type: string
-    sql: 'https://www.google.com' ;;
-    html: <a href="{{value}}">{{value}}</a> ;;
   }
 
   dimension: special_character_test {
@@ -598,6 +518,20 @@ dimension: the_whole_thing {
     type: average
     sql: ${sale_price} ;;
     value_format_name: usd
+      link: {
+        label: "Relative Link Drill with Param Test"
+        url: "/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name,users.state&f[order_items.is_big_order]=Yes&f[order_items.data_as_of]={{ _filters['order_items.data_as_of'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=orders.created_date"
+      }
+
+    link: {
+      label: "Relative Drill Link"
+      url: "/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name&f[order_items.is_big_order]=Yes&f[order_items.created_date]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
+    }
+
+    link: {
+      label: "Absolute Drill Link with Param"
+      url: "https://dcl.dev.looker.com/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name,users.state&f[order_items.is_big_order]=Yes&f[order_items.data_as_of]={{ _filters['order_items.data_as_of'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=orders.created_date"
+    }
   }
 
   # measure: average_sale_price_filtered_measure_1 {
@@ -605,19 +539,6 @@ dimension: the_whole_thing {
   #   sql: ${sale_price} ;;
   #   filters: [percent_rank_dt.percentile_buckets: "1"]
   # }
-
-
-  measure: order_count_usd_value_format {
-    type: count_distinct
-    sql: ${order_id} ;;
-    value_format_name: usd
-  }
-
-  measure: order_count_decimal_value_format {
-    type: count_distinct
-    sql: ${order_id} ;;
-    value_format_name: decimal_2
-  }
 
   measure: order_count_decimal_value_format_html {
     type: count_distinct
@@ -631,8 +552,6 @@ dimension: the_whole_thing {
 
 parameter: year_selector {
   type: string
-  allowed_value: { value: "2016" }
-  allowed_value: { value: "2017" }
   allowed_value: { value: "2018" }
   allowed_value: { value: "2019" }
   allowed_value: { value: "2020" }
@@ -643,8 +562,6 @@ parameter: year_selector {
     label_from_parameter: year_selector
     sql:
       CASE
-        WHEN {% parameter year_selector %} = '2016' THEN ${total_sale_price_2016}
-        WHEN {% parameter year_selector %} = '2017' THEN ${total_sale_price_2017}
         WHEN {% parameter year_selector %} = '2018' THEN ${total_sale_price_2018}
         WHEN {% parameter year_selector %} = '2019' THEN ${total_sale_price_2019}
         WHEN {% parameter year_selector %} = '2020' THEN ${total_sale_price_2020}
@@ -666,12 +583,6 @@ parameter: year_selector {
     filters: [created_year: "2020"]
   }
 
-  measure: total_sale_price_2020_number {
-    group_label: "Total Sale Price - Specific Years"
-    type: number
-    sql: case when ${total_sale_price_2020} > 0 then ${total_sale_price_2020} else null end ;;
-  }
-
   measure: total_sale_price_2019 {
     group_label: "Total Sale Price - Specific Years"
     type: sum
@@ -688,28 +599,30 @@ parameter: year_selector {
     filters: [created_year: "2018"]
   }
 
-  measure: total_sale_price_2017 {
-    group_label: "Total Sale Price - Specific Years"
-    type: sum
-    sql: ${sale_price};;
-    value_format_name: usd_0
-    filters: [created_year: "2017"]
-  }
-
-  measure: total_sale_price_2016 {
-    group_label: "Total Sale Price - Specific Years"
-    type: sum
-    sql: ${sale_price};;
-    value_format_name: usd_0
-    filters: [created_year: "2016"]
-  }
-
-
 ###############
 
   measure: count_orders_2020 {
     type: count
     filters: [created_year: "2020"]
+    link: {
+      label: "Drill into count orders 2020"
+      url: "
+      {% if _explore._name == 'order_items' %}
+      {{ dummy_2._link }}
+      {% endif %}"
+    }
+
+    link: {
+      label: "Drill with totals and row totals"
+      url: "{{ dummy_2._link }}&pivots=order_items.created_month&total=on&row_total=right"
+    }
+  }
+
+  measure: dummy_2 {
+    type: number
+    drill_fields: [users.state,count_orders_2020,created_month]
+    sql: 1 ;;
+    hidden: yes
   }
 
   measure: count_orders_2019 {
@@ -723,40 +636,22 @@ parameter: year_selector {
     value_format_name: percent_2
   }
 
-  # measure: total_users_over_total_orders {
-  #   type: number
-  #   sql: ${users.count}/nullif(${count},0) ;;
-  #   value_format_name: percent_2
-  # }
-
 ###### Drill Test ########
-  # measure: average_order_price {
-  #   type: average
-  #   sql: ${sale_price} ;;
-  #   value_format_name: decimal_0
-  #   link: {
-  #     label: "Drill Details"
-  #     url: "/explore/snowflake_test/order_items?fields=order_items.count,order_items.created_date,users.first_name,users.last_name&f[order_items.is_big_order]=Yes&f[order_items.created_date]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
-  # }
-  # }
+  measure: drill_test_measure {
+    type: average
+    sql: ${sale_price} ;;
+    value_format_name: decimal_0
+    link: {
+      label: "Drill Details"
+      url: "{{drill_fields_dummy_measure._link}}&f[order_items.is_big_order]=Yes&f[order_items.created_quarter]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
+    }
+  }
 
-  # measure: drill_test_measure {
-  #   type: average
-  #   sql: ${sale_price} ;;
-  #   value_format_name: decimal_0
-  #   link: {
-  #     label: "Drill Details"
-  #     url: "{{drill_fields_dummy_measure._link}}&f[order_items.is_big_order]=Yes&f[order_items.created_quarter]={{ _filters['order_items.created_quarter'] }}&f[users.country]=USA&f[users.state]={{ _filters['users.state'] }}&sorts=order_items.created_date+desc"
-  #   }
-  # }
-
-  # measure: drill_fields_dummy_measure {
-  #   type: number
-  #   sql: 1 ;;
-  #   drill_fields: [order_items.count,order_items.created_date,users.first_name,users.last_name]
-  # }
-
-  ######## Drill Test ##########
+  measure: drill_fields_dummy_measure {
+    type: number
+    sql: 1 ;;
+    drill_fields: [order_items.count,order_items.created_date,users.first_name,users.last_name]
+  }
 
   ######## example reported in bug #########
 
@@ -765,19 +660,10 @@ parameter: year_selector {
 #     url: "/explore/dw/jcdetail_all?fields=jcdetail_all.effective_date,employee_info.teammate_number,employee_info.first_name,employee_info.last_name,jcdetail_reference.class,jcdetail_all.quantity,hqunits_of_measure.unit_of_measure,jctask.task_name,jctask.task_description,jcdetail_all.total_labor&f[jccost_types.cost_type_group_description]=Labor&f[jcjob.master_project_number]={{ _filters['jcjob.master_project_number'] }}&f[effectivedate.data_as_of]={{ _filters['effectivedate.data_as_of'] }}&f[jcdetail_all.is_trans_type_cost]=Yes&sorts=jcdetail_all.effective_date" }
 # }
 
-
-
   measure: average_order_price_value_format {
     type: average
     sql: ${sale_price} ;;
     value_format: "[mod 0]0;[mod 1]0.#;[mod 2]0.##"
-  }
-
-  measure: average_order_price_2019 {
-    description: "measure of type number with division"
-    type: number
-    sql: 1.0*${total_sale_price_2019}/nullif(${count_orders_2019},0) ;;
-    value_format_name: usd_0
   }
 
   measure: running_total {
@@ -813,6 +699,22 @@ parameter: year_selector {
     type: number
     sql: 1.0*${total_sale_price}/nullif(${total_sale_price},${total_sale_price}+2) ;;
   }
+
+  measure: test_with_required_fields {
+    type: yesno
+    # sql: min(${created_date}) < current_date() ;;
+    # sql: min(${inventory_items.created_date}) OVER (PARTITION BY ${status}, ${shipped_date}) = ${inventory_items.created_date};;
+    sql: min(${created_date}) OVER (PARTITION BY ${status}, ${most_recent_shipped_date}) = ${created_date};;
+    # required_fields: [inventory_items.created_date, status, shipped_date]
+    required_fields: [created_date, status, most_recent_shipped_date]
+  }
+
+  measure: most_recent_shipped_date {
+    type: date
+    sql: max(${shipped_date}) ;;
+  }
+
+  # sql: (MIN(${fact_scan_event_filtered.created_at_date}) OVER (PARTITION BY ${schema_id_mhu}, ${finding_sub_type}, ${first_appearance_date}) = ${fact_scan_event_filtered.created_at_date});;
 
 
 ######## Rank test for CJ
