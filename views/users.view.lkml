@@ -111,6 +111,12 @@ view: users {
     sql: ${TABLE}."ZIP" ;;
   }
 
+  dimension: zip_with_map_layer {
+    type: zipcode
+    sql: ${TABLE}."ZIP" ;;
+    # map_layer_name: us_canada_postal_codes
+  }
+
   dimension: first_name_action {
     type: string
     sql: ${TABLE}.first_name ;;

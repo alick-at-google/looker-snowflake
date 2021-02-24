@@ -347,7 +347,7 @@ dimension: parameterized_date_field_yesno {
   dimension: sale_price_value_format_id_type {
     type: string
     sql: CONCAT('\'',${TABLE}."SALE_PRICE"*12345678987650000::VARCHAR);;
-    value_format: "id"
+    # value_format: "id"
   }
 
   dimension: sale_price_value_format_id_type_2 {
@@ -419,8 +419,10 @@ dimension: parameterized_date_field_yesno {
   dimension: sale_price_times_100 {
     type: number
     sql: ${TABLE}.sale_price * 100 ;;
-    value_format_name: decimal_2
+    # value_format_name: decimal_2
     # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
+    # value_format: "[>=1000000]$0.0,,\" M\";[>=1000]$0.0,\" K\";[<1000]$0.0"
+    value_format: "[>=1000000]$0.0,,\" M\";[>=1000]$0.0,\" K\";[<1000]$0.00"
   }
 
   dimension: sale_price_times_negative_10 {
@@ -663,7 +665,7 @@ parameter: year_selector {
   measure: average_order_price_value_format {
     type: average
     sql: ${sale_price} ;;
-    value_format: "[mod 0]0;[mod 1]0.#;[mod 2]0.##"
+    # value_format: "[mod 0]0;[mod 1]0.#;[mod 2]0.##"
   }
 
   measure: running_total {

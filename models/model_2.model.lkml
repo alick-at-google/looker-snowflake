@@ -8,10 +8,6 @@ include: "/new_folder/testing.view"
 
 include: "/snowflake_test/*.view"
 
-# map_layer: us_municipalities {
-#   url: "https://unpkg.com/es-atlas@0.2.0/es/municipalities.json"
-# }
-
 # explore: order_items {
 #   join: products {
 #     relationship: many_to_one
