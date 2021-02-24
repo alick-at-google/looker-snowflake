@@ -151,6 +151,11 @@ view: users {
     # html: {{ state._rendered_value }}: {{ rendered_value }} ;;
   }
 
+  measure: most_recent_user_created_date {
+    type: date
+    sql: max(${created_date}) ;;
+  }
+
   measure: count_users_in_ny {
     type: count
     filters: [state: "New York"]
