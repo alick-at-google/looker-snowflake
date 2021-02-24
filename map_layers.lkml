@@ -19,7 +19,7 @@ map_layer: us_cbsa {
 }
 
 
-map_layer: us_canada_postal_codes{
+map_layer: us_canada_postal_codes {
   format: "vector_tile_region"
   url: "https://a.tiles.mapbox.com/v4/looker-maps.8gkhpr0e/{z}/{x}/{y}.mvt?access_token="
   feature_key: "us_canada_postal_codesgeojson"
