@@ -39,8 +39,12 @@ explore: tiers_on_measure {
 }
 
 explore: order_items {
+  # always_filter: {
+  #   filters: [order_items.created_date: "last 7 days", order_items.status: ""]
+  # }
+
   always_filter: {
-    filters: [order_items.created_date: "last 7 days", order_items.status: ""]
+    filters: [order_items.created_date: "last 7 days", order_items.status: "Returned"]
   }
   # symmetric_aggregates:  no
   # sql_always_where: ${order_items.is_big_order} ;;
