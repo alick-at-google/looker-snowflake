@@ -40,6 +40,11 @@ view: users {
     sql: ${TABLE}."AGE" ;;
   }
 
+  measure: median_age {
+    type: median
+    sql: ${age} ;;
+  }
+
   dimension: city {
     type: string
     sql: ${TABLE}."CITY" ;;
@@ -101,6 +106,32 @@ view: users {
     sql: ${TABLE}."STATE" ;;
   }
 
+  dimension: city_comma_state {
+    type: string
+    sql: case when ${country} = 'USA' then concat(${city}, ', ', ${state}) else concat(${city},${state}) end ;;
+  }
+
+  dimension: liquid_contains_test {
+    type: string
+    # sql:
+    # {% if ${gender} == 'Female' %}
+    # female
+    # {% elsif ${city_comma_state} contains ',' %}
+    # contains comma
+    # {% elsif ${city_comma_state} %}
+    # does not contain comma
+    # {% endif %};;
+    sql:
+    {% if users.gender == 'Female' %}
+    'female'
+    {% elsif users.city contains 'city' or users.city contains 'City' %}
+    'contains city'
+    {% endif %};;
+  }
+
+    #   {% elsif users.city does not contain 'city' or users.city does not contain 'City' %}
+    # 'does not contain city'
+
   dimension: traffic_source {
     type: string
     sql: ${TABLE}."TRAFFIC_SOURCE" ;;
@@ -142,6 +173,11 @@ view: users {
         }
       }
     }
+  }
+
+  measure: max_state_test {
+    type: string
+    sql: max(${state}) ;;
   }
 
   measure: count {

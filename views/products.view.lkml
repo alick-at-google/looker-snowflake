@@ -114,6 +114,18 @@ view: products {
   dimension: brand {
     type: string
     sql: ${TABLE}."BRAND" ;;
+    # action: {
+    #   label: "test data action"
+    #   url: "https://www.google.com/"
+    #   param: {
+    #     name: "hello"
+    #     value: "hello"
+    #   }
+    #   param: {
+    #     name: "goodbye"
+    #     value: "goodbye"
+    #   }
+    # }
   }
 
   dimension: category {
@@ -184,6 +196,30 @@ view: products {
     type: count
     drill_fields: [id, name, distribution_centers.name, distribution_centers.id, inventory_items.count]
     value_format_name: decimal_0
+  }
+
+  measure: count_department_not_null {
+    type: count_distinct
+    sql: ${department} ;;
+    filters: [department: "-NULL"]
+  }
+
+  measure: count_category_not_null {
+    type: count_distinct
+    sql: ${category} ;;
+    filters: [category: "-NULL"]
+  }
+
+  measure: total_of_counts {
+    type: number
+    sql: ${count_category_not_null}+${count_department_not_null} ;;
+  }
+
+  measure: total_of_counts_2 {
+    type: sum
+    sql:
+    case when ${department} is not null then 1 else 0 end +
+    case when ${category} is not null then 1 else 0 end;;
   }
 
   measure: median_test {

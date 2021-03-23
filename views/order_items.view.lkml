@@ -5,6 +5,36 @@ view: order_items {
 
 #########
 
+  parameter: daily {
+    type: string
+    # suggest_dimension: order_items.created_date_string
+  }
+
+  parameter: monthly {
+    type: string
+    # suggest_dimension: order_items.created_month_string
+  }
+
+  parameter: yearly {
+    type: date
+  }
+
+dimension: created_year_string {
+  type: string
+  sql: ${created_date} ;;
+}
+
+  dimension: created_month_string {
+    type: string
+    sql: ${created_month} ;;
+  }
+
+
+  measure: median_sale_price {
+    type: median
+    sql: ${sale_price} ;;
+  }
+
 parameter: data_as_of {
   type:  date
 }
@@ -87,9 +117,13 @@ dimension: parameterized_date_field_yesno {
   dimension_group: time_between_created_and_returned {
     type: duration
     intervals: [second, minute, hour, day, week]
-    # sql: {% condition date_filter_1 %} ${TABLE}.created_at {% endcondition %};;
     sql_start: ${TABLE}.created_at ;;
     sql_end: ${TABLE}.returned_at ;;
+  }
+
+  dimension: templated_filter_on_date {
+    type: date_time
+    sql: {% condition date_filter_1 %} ${created_raw} {% endcondition %};;
   }
 
   dimension: create_test_date {
@@ -273,7 +307,7 @@ dimension: parameterized_date_field_yesno {
   dimension: date {
   description: "delivered date"
    type: date
-    sql: ${delivered_date} ;;
+    sql: {% condition date_filter_1 %} to_timestamp(${delivered_raw}) {% endcondition %}  ;;
     # sql:${TABLE}."CREATED_AT";;
     # required_fields: [order_items.year,order_items.week_of_year]
   }
@@ -461,8 +495,10 @@ dimension: parameterized_date_field_yesno {
 
 
   measure: count {
+    description: "total count of order items"
     type: count
     drill_fields: [detail*]
+    filters: [order_items.returned_date: "-NULL"]
   }
 
   measure: percentile_75_test {

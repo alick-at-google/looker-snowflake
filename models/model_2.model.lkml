@@ -21,6 +21,11 @@ datagroup: snowflake_test_default_datagroup {
   max_cache_age: "1 hour"
 }
 
+explore: blah {
+  extension: required
+}
+
+
 explore: products_capitalization {}
 
 # explore: transpose_measures_dt {}
@@ -34,7 +39,10 @@ explore: tiers_on_measure {
 }
 
 explore: order_items {
-  symmetric_aggregates:  no
+  always_filter: {
+    filters: [order_items.created_date: "last 7 days", order_items.status: "complete"]
+  }
+  # symmetric_aggregates:  no
   # sql_always_where: ${order_items.is_big_order} ;;
 
   # sql_always_where: {%condition order_items.is_large_order%} ${order_items.large_order_flag} {%endcondition%};;
