@@ -227,8 +227,9 @@ view: products {
     sql: ${cost} ;;
   }
 
-  measure: group_concat_category {
+  measure: category_list {
     type: string
-    sql: GROUP_CONCAT(${category}) ;;
+    # sql: GROUP_CONCAT(${category}) ;;
+    sql: LISTAGG(distinct ${category},', ') ;;
   }
 }

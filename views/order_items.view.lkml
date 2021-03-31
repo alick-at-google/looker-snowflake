@@ -78,7 +78,8 @@ dimension: parameterized_date_field_yesno {
 }
 
   filter: date_filter_1 {
-    type: date
+    type: date_time
+    default_value: "today"
   }
 
   filter: number {
@@ -122,8 +123,8 @@ dimension: parameterized_date_field_yesno {
   }
 
   dimension: templated_filter_on_date {
-    type: date_time
-    sql: {% condition date_filter_1 %} ${created_raw} {% endcondition %};;
+    type: date
+    sql: {% condition date_filter_1 %} ${created_raw}::timestamp_ntz {% endcondition %};;
   }
 
   dimension: create_test_date {
@@ -299,6 +300,16 @@ dimension: parameterized_date_field_yesno {
     # datatype: date
   }
 
+  dimension: year_of_week {
+    # type: number
+    sql: YEAROFWEEKISO(${created_raw}) ;;
+  }
+
+#   CASE WHEN (week < 52 AND mod = 0) THEN day_of_year/52
+# WHEN (week < 52 AND mod > 0) THEN ${week} + 1,
+# ELSE 52
+# END
+
   dimension: week_of_year {
     type: number
     sql: TO_NUMBER(${created_week_of_year}) ;;
@@ -452,11 +463,13 @@ dimension: parameterized_date_field_yesno {
 
   dimension: sale_price_times_100 {
     type: number
-    sql: ${TABLE}.sale_price * 100 ;;
+    sql: case when ${sale_price} <50 then ${sale_price}*-1 else ${sale_price} end;;
+    # sql: ${TABLE}.sale_price * 100 ;;
     # value_format_name: decimal_2
     # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
     # value_format: "[>=1000000]$0.0,,\" M\";[>=1000]$0.0,\" K\";[<1000]$0.0"
-    value_format: "[>=1000000]$0.0,,\" M\";[>=1000]$0.0,\" K\";[<1000]$0.00"
+    # value_format: "[>=1000000]$0.0,,\" M\";[>=1000]$0.0,\" K\";[<1000]$0.00"
+    # value_format: "$#.00;($#.00)"
   }
 
   dimension: sale_price_times_negative_10 {
@@ -495,10 +508,11 @@ dimension: parameterized_date_field_yesno {
 
 
   measure: count {
+    label: "show the count"
     description: "total count of order items"
     type: count
-    drill_fields: [detail*]
-    filters: [order_items.returned_date: "-NULL"]
+    # drill_fields: [detail*]
+    # filters: [order_items.returned_date: "-NULL"]
   }
 
   measure: percentile_75_test {
