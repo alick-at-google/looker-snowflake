@@ -79,6 +79,7 @@ view: users {
   dimension: first_name {
     type: string
     sql: ${TABLE}."FIRST_NAME" ;;
+    required_fields: [id]
   }
 
   dimension: gender {
