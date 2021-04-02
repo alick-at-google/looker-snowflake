@@ -282,6 +282,7 @@ dimension: parameterized_date_field_yesno {
       time,
       date,
       day_of_week_index,
+      day_of_year,
       week,
       week_of_year,
       month,
@@ -300,10 +301,59 @@ dimension: parameterized_date_field_yesno {
     # datatype: date
   }
 
+######### End of year with weeks testing
   dimension: year_of_week {
+    group_label: "end of year testing"
     # type: number
     sql: YEAROFWEEKISO(${created_raw}) ;;
   }
+
+  dimension: weekofyear_snowflake {
+    group_label: "end of year testing"
+    # type: number
+    sql: WEEKOFYEAR(${created_raw}) ;;
+  }
+
+  dimension: isoweekofyear_snowflake {
+    group_label: "end of year testing"
+    # type: number
+    sql: WEEKISO(${created_raw}) ;;
+  }
+
+  dimension: mod {
+    type: number
+    sql:  mod(${created_day_of_year},52) ;;
+  }
+
+  dimension: case_when_week {
+    group_label: "end of year testing"
+    type: number
+    sql:
+    case when (${created_week_of_year} = 52 AND ${mod} = 0) then ${created_week_of_year}
+    when (${created_week_of_year} <= 53 AND ${created_week_of_year} >= 52 AND ${mod} > 0 AND ${created_month_name} = 'December') then (${created_week_of_year})
+    when (${created_week_of_year} <= 53 AND ${created_week_of_year} >= 52 AND ${mod} > 0 AND ${created_month_name} = 'January') then 1
+    else ${created_week_of_year} end;;
+  }
+
+  dimension: case_when_week_2 {
+    group_label: "end of year testing"
+    type: number
+    sql:
+    case
+    when (${created_week_of_year} = 1 AND ${created_month_name} = 'December') then 100
+    when (${created_week_of_year} <= 53 AND ${created_week_of_year} >= 52 AND ${created_month_name} = 'December') then (${created_week_of_year})
+    when (${created_week_of_year} <= 53 AND ${created_week_of_year} >= 52 AND ${created_month_name} = 'January') then 1
+    else ${created_week_of_year} end;;
+  }
+
+  # dimension: week_test {
+  #   group_label: "end of year testing"
+  #   type: number
+  #   sql:  CASE WHEN (${created_week} < 52 AND mod = 0) THEN ${created_day_of_year}/52
+  #         WHEN (${created_week_of_year} < 52 AND mod(${created_day_of_year}/52) >0) THEN ${created_week_of_year} + 1
+  #         ELSE 52
+  #         END ;;
+  # }
 
 #   CASE WHEN (week < 52 AND mod = 0) THEN day_of_year/52
 # WHEN (week < 52 AND mod > 0) THEN ${week} + 1,
@@ -311,9 +361,14 @@ dimension: parameterized_date_field_yesno {
 # END
 
   dimension: week_of_year {
+    group_label: "end of year testing"
     type: number
     sql: TO_NUMBER(${created_week_of_year}) ;;
   }
+
+
+###########. End test
+
 
   dimension: date {
   description: "delivered date"
@@ -511,6 +566,8 @@ dimension: parameterized_date_field_yesno {
     label: "show the count"
     description: "total count of order items"
     type: count
+
+
     # drill_fields: [detail*]
     # filters: [order_items.returned_date: "-NULL"]
   }

@@ -91,6 +91,12 @@ view: users {
     sql: ${TABLE}."LAST_NAME" ;;
   }
 
+  dimension: full_name {
+    type: string
+    sql: concat(${first_name}, ' ', ${last_name}) ;;
+    required_fields: [state]
+  }
+
   dimension: latitude {
     type: number
     sql: ${TABLE}."LATITUDE" ;;
