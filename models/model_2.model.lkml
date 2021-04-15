@@ -72,6 +72,7 @@ explore: order_items {
   }
 
   join: inventory_items {
+    view_label: "InventoryItems"
     type: left_outer
     sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
     relationship: many_to_one
@@ -118,6 +119,16 @@ explore: order_items {
     sql_on: ${order_items.created_date} = ${previous_day_with_lead_function_dt.date} ;;
     relationship: many_to_one
   }
+
+#   join: rank_city_state {
+#     type: left_outer
+#     sql_on: ${order_items.created_date} = ${rank_city_state.order_items_created_date} AND ${rank_city_state.rank} = 1 ;;
+#   }
+
+#   join: ndt_test {
+#     type: cross
+#     sql: 1=1 ;;
+#   }
 }
 
 
@@ -125,6 +136,13 @@ explore: products {
   join: distribution_centers {
     type: left_outer
     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+    relationship: many_to_one
+  }
+  join: inventoryitems {
+    from: inventory_items
+    view_label: "Inventoryitems"
+    type: left_outer
+    sql_on: ${inventoryitems.product_id} = ${products.id} ;;
     relationship: many_to_one
   }
 }

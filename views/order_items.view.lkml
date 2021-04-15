@@ -3,33 +3,6 @@ view: order_items {
     ;;
   # drill_fields: [id]
 
-#########
-
-  parameter: daily {
-    type: string
-    # suggest_dimension: order_items.created_date_string
-  }
-
-  parameter: monthly {
-    type: string
-    # suggest_dimension: order_items.created_month_string
-  }
-
-  parameter: yearly {
-    type: date
-  }
-
-dimension: created_year_string {
-  type: string
-  sql: ${created_date} ;;
-}
-
-  dimension: created_month_string {
-    type: string
-    sql: ${created_month} ;;
-  }
-
-
   measure: median_sale_price {
     type: median
     sql: ${sale_price} ;;
@@ -86,6 +59,33 @@ dimension: parameterized_date_field_yesno {
     type: number
   }
 
+  filter: number_as_string {
+    type: string
+  }
+
+  parameter: number_parameter {
+    type: number
+  }
+
+  parameter: string_parameter {
+    type: string
+  }
+
+  dimension: sale_price_with_number_param {
+    type: number
+    sql: case when {% parameter number_parameter %} = ${sale_price} then ${sale_price} else null end ;;
+  }
+
+  dimension: sale_price_with_string_param {
+    type: number
+    sql: case when {% parameter string_parameter %} = ${sale_price} then ${sale_price} else null end ;;
+  }
+
+  dimension: templated_filter_test_with_filter {
+    type: number
+    sql: case when {% condition number_as_string %} ${sale_price} {% endcondition %} then ${sale_price} else null end ;;
+  }
+
 #   dimension: html_drill_test {
 #     group_label: "html testing"
 #     type: string
@@ -132,10 +132,10 @@ dimension: parameterized_date_field_yesno {
     sql: ${created_date} ;;
   }
 
-  dimension: current_date {
-    group_label: "Current Date"
-    type: date
-    sql: current_date();;
+  dimension_group: current {
+    type: time
+    timeframes: [date, week, day_of_week_index, day_of_week]
+    sql: current_date() ;;
   }
 
   dimension: current_time {
@@ -267,6 +267,23 @@ dimension: parameterized_date_field_yesno {
     }
   }
 
+  dimension: dummy_case {
+    case: {
+      when: {
+        label: "Count"
+        sql: 1=1 ;;
+      }
+      when: {
+        label: "Average Sale Price"
+        sql: 1=1 ;;
+      }
+      when: {
+        label: "Median Sale Price"
+        sql: 1=1 ;;
+      }
+    }
+  }
+
 ###############################################################
 
   dimension: id {
@@ -335,13 +352,12 @@ dimension: parameterized_date_field_yesno {
     else ${created_week_of_year} end;;
   }
 
-  dimension: case_when_week_2 {
+  dimension: case_when_week_of_year {
     group_label: "end of year testing"
     type: number
     sql:
     case
-    when (${created_week_of_year} = 1 AND ${created_month_name} = 'December') then 100
-    when (${created_week_of_year} <= 53 AND ${created_week_of_year} >= 52 AND ${created_month_name} = 'December') then (${created_week_of_year})
+    when (${created_week_of_year} = 1 AND ${created_month_name} = 'December') then 53
     when (${created_week_of_year} <= 53 AND ${created_week_of_year} >= 52 AND ${created_month_name} = 'January') then 1
     else ${created_week_of_year} end;;
   }
@@ -518,8 +534,8 @@ dimension: parameterized_date_field_yesno {
 
   dimension: sale_price_times_100 {
     type: number
-    sql: case when ${sale_price} <50 then ${sale_price}*-1 else ${sale_price} end;;
-    # sql: ${TABLE}.sale_price * 100 ;;
+    # sql: case when ${sale_price} <50 then ${sale_price}*-1 else ${sale_price} end;;
+    sql: ${TABLE}.sale_price * 100 ;;
     # value_format_name: decimal_2
     # value_format: "[>=1000000000]0.00,,,\"B\";[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
     # value_format: "[>=1000000]$0.0,,\" M\";[>=1000]$0.0,\" K\";[<1000]$0.0"
@@ -533,43 +549,10 @@ dimension: parameterized_date_field_yesno {
     value_format_name: decimal_2
   }
 
-  dimension: sale_price_manual_tiers {
-    type: string
-    sql: case when ${sale_price_times_100} <= 1000 then 'Under $1000'
-          when ${sale_price_times_100} > 1000 AND ${sale_price_times_100} <= 2500 then '$1,000 - $2,500'
-          when ${sale_price_times_100} > 2500 AND ${sale_price_times_100} <= 5000 then '$2,500 - $5,000'
-          when ${sale_price_times_100} > 5000 AND ${sale_price_times_100} <= 10000 then '$5,000 - $10,000'
-          when ${sale_price_times_100} > 10000 AND ${sale_price_times_100} <= 12500 then '$10,000 - $12,500'
-          when ${sale_price_times_100} > 12500 AND ${sale_price_times_100} <= 20000 then '$12,500 - $20,000'
-          when ${sale_price_times_100} > 20000 AND ${sale_price_times_100} <= 25000 then '$20,000 - $25,000'
-          when ${sale_price_times_100} > 25000 AND ${sale_price_times_100} <= 100000 then 'Above $100,000'
-          else null end;;
-    order_by_field: sort_order_2
-  }
-
-  dimension: sort_order_2 {
-    type: number
-    sql: case when ${sale_price_times_100} <= 1000 then 1
-          when ${sale_price_times_100} > 1000 AND ${sale_price_times_100} <= 2500 then 10
-          when ${sale_price_times_100} > 2500 AND ${sale_price_times_100} <= 5000 then 25
-          when ${sale_price_times_100} > 5000 AND ${sale_price_times_100} <= 10000 then 50
-          when ${sale_price_times_100} > 10000 AND ${sale_price_times_100} <= 12500 then 100
-          when ${sale_price_times_100} > 12500 AND ${sale_price_times_100} <= 20000 then 125
-          when ${sale_price_times_100} > 20000 AND ${sale_price_times_100} <= 25000 then 200
-          when ${sale_price_times_100} > 25000 AND ${sale_price_times_100} <= 100000 then 250
-      end
-       ;;
-  }
-
-
   measure: count {
-    label: "show the count"
     description: "total count of order items"
     type: count
-
-
     # drill_fields: [detail*]
-    # filters: [order_items.returned_date: "-NULL"]
   }
 
   measure: percentile_75_test {
@@ -617,6 +600,11 @@ dimension: parameterized_date_field_yesno {
     value_format_name: decimal_2
   }
 
+  measure: test {
+    type: number
+    sql: ${total_sale_price} / ${count} ;;
+  }
+
   measure: percent_of_total_sale_price {
     type: percent_of_total
     sql: ${total_sale_price};;
@@ -652,9 +640,8 @@ dimension: parameterized_date_field_yesno {
   measure: order_count_decimal_value_format_html {
     type: count_distinct
     sql: ${order_id} ;;
-    value_format_name: decimal_2
-    html: €{{rendered_value}} ;;
-    # drill_fields: [drill_set*]
+    value_format_name: usd_0
+    html: €{{ value | round }} ;;
   }
 
 ############ Total Sale Price per Year Parameter Test ##############

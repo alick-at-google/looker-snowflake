@@ -40,6 +40,7 @@ view: orders_by_quarter_derived_table {
   }
 
   dimension: order_items_order_count_decimal_value_format {
+    label: "Dimensionalized Order Count"
     type: number
     sql: ${TABLE}."order_items.order_count_decimal_value_format" ;;
   }
