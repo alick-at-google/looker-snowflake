@@ -65,10 +65,12 @@ dimension: parameterized_date_field_yesno {
 
   parameter: number_parameter {
     type: number
+    default_value: "25"
   }
 
   parameter: string_parameter {
     type: string
+    default_value: "50"
   }
 
   dimension: sale_price_with_number_param {
