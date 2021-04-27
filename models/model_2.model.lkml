@@ -9,6 +9,8 @@ include: "/new_folder/testing.view"
 
 include: "/snowflake_test/*.view"
 
+include: "/drill_link_lookml_dash.dashboard"
+
 # explore: order_items {
 #   join: products {
 #     relationship: many_to_one

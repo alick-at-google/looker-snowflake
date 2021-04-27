@@ -22,9 +22,30 @@ parameter: timeframe_selection {
   type: string
   allowed_value: { label: "Day" value: "day" }
   allowed_value: { label: "Week" value: "week" }
-  allowed_value: { label: "Quarter" value: "quarter" }
   allowed_value: { label: "Month" value: "month" }
+  allowed_value: { label: "Year" value: "year" }
 }
+
+dimension: dynamic_timeframe_test_for_agg_table {
+  type: date
+  sql: CASE WHEN {% parameter timeframe_selection %} = 'day' THEN ${created_raw}::varchar
+WHEN {% parameter timeframe_selection %} = 'week' THEN date_trunc('week',${created_raw})::varchar
+WHEN {% parameter timeframe_selection %} = 'month' THEN date_trunc('month',${created_raw})::varchar
+WHEN {% parameter timeframe_selection %} = 'year' THEN date_trunc('year',${created_raw})::varchar
+END;;
+allow_fill: no
+}
+
+
+  dimension: dynamic_timeframe_test_for_agg_table_2 {
+    type: date
+    sql: CASE WHEN {% parameter timeframe_selection %} = 'day' THEN ${created_date}
+      WHEN {% parameter timeframe_selection %} = 'week' THEN ${created_week}
+      WHEN {% parameter timeframe_selection %} = 'month' THEN ${created_month}
+      WHEN {% parameter timeframe_selection %} = 'year' THEN ${created_year}
+      END;;
+    allow_fill: no
+  }
 
 dimension: parameterized_date_field {
   group_label: "parameterizing date dimension"

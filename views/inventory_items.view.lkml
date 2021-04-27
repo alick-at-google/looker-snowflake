@@ -10,6 +10,7 @@ view: inventory_items {
   }
 
   dimension: cost {
+    # label: "{% if _view._name == 'inventoryitems' %} Inventory Items Cost {% else %} Cost {% endif %}"
     type: number
     sql: ${TABLE}."COST" ;;
   }

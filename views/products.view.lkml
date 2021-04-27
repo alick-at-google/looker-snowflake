@@ -232,4 +232,9 @@ view: products {
     # sql: GROUP_CONCAT(${category}) ;;
     sql: LISTAGG(distinct ${category},', ') ;;
   }
+
+  # measure: correlated_subquery {
+  #   type: number
+  #   sql: (SELECT count(${category}) FROM ${TABLE} WHERE ${users.state} = 'California') ;;
+  # }
 }
