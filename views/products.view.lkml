@@ -86,9 +86,35 @@ view: products {
     # suggest_dimension: products.category
   }
 
+  filter: category_filter_field {
+    type: string
+    suggest_dimension: category
+    sql:
+    {% if category_filter_field contains "Jeans" %}
+    1 = 0
+    {% else %}
+    {% condition category_filter_field %} ${category} {% endcondition %}
+    {% endif %} ;;
+  }
+
   dimension: update_category_based_on_category_suggest_dim_param {
     type: string
     sql: {% parameter category_param_with_suggest_dimension %} ;;
+  }
+
+  dimension: category_with_filter_field {
+    type: string
+    sql: {% condition category_filter_field %} ${category} {% endcondition %} ;;
+  }
+
+  dimension: category_with_filter_field_and_liquid {
+    type: string
+    sql:
+    {% if category_filter_field contains "Jeans" %}
+    1 = 0
+    {% else %}
+    {% condition category_filter_field %} ${category} {% endcondition %}
+    {% endif %};;
   }
 
   dimension: dynamic_dimension {

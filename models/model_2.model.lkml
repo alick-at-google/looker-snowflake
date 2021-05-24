@@ -154,6 +154,7 @@ explore: products {
 
 explore: inventory_items {
   symmetric_aggregates: no
+  fields: [ALL_FIELDS*, -order_items.sale_price_with_negatives]
   join: order_items {
     type: left_outer
     # relationship: many_to_one

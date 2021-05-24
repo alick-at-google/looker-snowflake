@@ -79,7 +79,54 @@ view: users {
   dimension: first_name {
     type: string
     sql: ${TABLE}."FIRST_NAME" ;;
-    required_fields: [id]
+    # required_fields: [id]
+  }
+
+  filter: first_name_filter_field {
+    suggest_dimension: first_name
+  }
+
+  parameter: first_name_parameter {
+    suggest_dimension: first_name
+  }
+
+  dimension: first_name_liquid {
+    type: string
+    # sql: {% condition first_name_filter_field %} ${first_name} {% endcondition %};;
+    sql: ${TABLE}."FIRST_NAME";;
+    # skip_drill_filter: yes
+    html:
+    {% if first_name_filter_field._is_filtered and value == _filters['users.first_name_filter_field'] %}
+    {{value}}
+    {% elsif first_name_filter_field._is_filtered and value <> _filters['users.first_name_filter_field'] %}
+    Other Group
+    {% else %}
+    {{value}}
+    {% endif %};;
+  }
+
+  dimension: first_name_liquid_3 {
+    type: string
+    # sql: {% condition first_name_filter_field %} ${first_name} {% endcondition %};;
+    sql: ${TABLE}."FIRST_NAME";;
+    # skip_drill_filter: yes
+    html:
+    {% if value == _filters['users.first_name_parameter'] %}
+    {{value}}
+    {% else %}
+    Other Group
+    {% endif %};;
+  }
+
+  dimension: first_name_liquid_2 {
+    type: string
+    sql: ${TABLE}.first_name ;;
+    html:
+    {% if first_name_liquid_2._is_filtered and value == _filters['users.first_name_liquid_2'] %}
+    {{value}}
+    {% else %}
+    Other Group
+    {% endif %};;
   }
 
   dimension: gender {
@@ -95,6 +142,7 @@ view: users {
   dimension: full_name {
     type: string
     sql: concat(${first_name}, ' ', ${last_name}) ;;
+    html: {{first_name._value}}<br>{{last_name._rendered_value}} ;;
     required_fields: [state]
   }
 
@@ -192,6 +240,12 @@ view: users {
     drill_fields: [id, first_name, last_name, events.count, order_items.count]
     value_format_name: decimal_0
     # html: {{ state._rendered_value }}: {{ rendered_value }} ;;
+  }
+
+  measure: user_count_running_total {
+    type: running_total
+    sql: ${count} ;;
+    direction: "column"
   }
 
   measure: most_recent_user_created_date {

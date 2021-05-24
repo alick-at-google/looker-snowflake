@@ -116,4 +116,64 @@ view: inventory_items {
     percentile: 25
     sql: ${product_retail_price} ;;
   }
+
+
+  measure: dummycontact {
+    # hidden: yes
+    type: string
+    sql: max('Contact Us');;
+    html: <div class="tc w-100 h-100 flex items-center flex-column overflow-hidden" style="background:#FFFF">
+
+      <div class='flex flex-grow-1 items-center' style="font-size:0.9em;color:white;">
+
+      <a href="mailto:JWEITZ@its.jnj.com" target="_top"> Contact Us </a> </div>
+
+      </div> ;;
+  }
+
+
+  measure: dummycontact2 {
+    # hidden: yes
+    type: string
+    sql: max('Contact Us');;
+    html:
+      <a href="mailto:JWEITZ@its.jnj.com" target="_top"> Contact Us </a> ;;
+  }
+
+
+  measure: dummycontact3 {
+    # hidden: yes
+    type: string
+    sql: max('Contact Us');;
+    html:
+      <a href="mailto:danielle.behette@looker.com" target="_top"> Contact Us </a> ;;
+  }
+
+  measure: dummycontact4 {
+    # hidden: yes
+    type: string
+    sql: max('Contact Us');;
+    html:
+      <a href="mailto:danielle.behette@looker.com"> Contact Us </a> ;;
+  }
+
+  measure: dummycontact5 {
+    # hidden: yes
+    type: string
+    sql: max('Contact Us');;
+    html:
+      <a href="www.google.com"> Contact Us </a> ;;
+  }
+
+
+  dimension: mailto {
+    type: string
+    sql: 'Contact Us' ;;
+    link: {
+      label: "Contact Warehouse Support"
+      url: "mailto:danielle.behette@looker.com"
+    }
+  }
+
+  # <a href="mailto:unsubscribeCSAT@looker.zendesk.com?subject=CSAT Unsubscribe" >click here</a>
 }

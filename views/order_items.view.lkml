@@ -11,6 +11,7 @@ view: order_items {
 parameter: data_as_of {
   type:  date
 }
+#comment
 
 parameter: number_selection {
   group_label: "parameterizing date dimension"
@@ -323,6 +324,7 @@ dimension: parameterized_date_field_yesno {
       date,
       day_of_week_index,
       day_of_year,
+      day_of_month,
       week,
       week_of_year,
       month,
@@ -475,6 +477,21 @@ dimension: parameterized_date_field_yesno {
     type: number
     sql: ${TABLE}."SALE_PRICE" ;;
   }
+
+  #########
+  dimension: sale_price_with_negatives {
+    type: number
+    sql: case when (${products.category}= 'Leggings') then -1*${sale_price} else ${sale_price} end;;
+    value_format_name: usd_0
+  }
+
+  measure: total_sale_price_with_negatives {
+    type: sum
+    sql: ${sale_price_with_negatives} ;;
+    value_format_name: usd_0
+  }
+
+#############
 
   dimension: sale_price_tiers {
     type: tier
@@ -665,6 +682,18 @@ dimension: parameterized_date_field_yesno {
     sql: ${order_id} ;;
     value_format_name: usd_0
     html: €{{ value | round }} ;;
+  }
+
+  dimension: date_html {
+    type: string
+    sql: '('||${created_date}||' - '||${returned_date}||') '||${users.first_name} ;;
+    html: ( {{ created_raw._value | date: "%b %d, %y" }} - {{ created_raw._value | date: "%b %d, %y" }} )  {{ users.id._value }} ;;
+    #- {{ returned_raw._rendered_value | date: "%b %d, %y" }}) {{ users.first_name._rendered_value }} ;;
+  }
+
+  measure: filtering_on_measure_test {
+    type: number
+    sql: case when ${total_sale_price} > 100 then count(distinct ${id}) else null end ;;
   }
 
 ############ Total Sale Price per Year Parameter Test ##############
