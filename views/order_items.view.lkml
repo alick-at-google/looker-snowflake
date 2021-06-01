@@ -882,6 +882,85 @@ parameter: year_selector {
   #   sql:${rank_derived_table.rank} ;;
   # }
 
+
+
+
+
+  ############# Snowflake Dialect PoP Method 1: Use Looker's Native Date Dimension Groups Flavia ###############
+
+#(Method 1a) you may also wish to create MTD and YTD filters in LookML
+
+  dimension: wtd_only {
+    group_label: "To-Date Filters"
+    label: "WTD"
+    view_label: "_PoP"
+    type: yesno
+    #dow is day of week in snowflake
+    sql:  (EXTRACT(DOW FROM ${created_raw}) < EXTRACT(DOW FROM CURRENT_TIMESTAMP())
+                OR
+            (EXTRACT(DOW FROM ${created_raw}) = EXTRACT(DOW FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(HOUR FROM ${created_raw}) < EXTRACT(HOUR FROM CURRENT_TIMESTAMP()))
+                OR
+            (EXTRACT(DOW FROM ${created_raw}) = EXTRACT(DOW FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(HOUR FROM ${created_raw}) <= EXTRACT(HOUR FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(MINUTE FROM ${created_raw}) < EXTRACT(MINUTE FROM CURRENT_TIMESTAMP())))  ;;
+  }
+
+  dimension: mtd_only {
+    group_label: "To-Date Filters"
+    label: "MTD"
+    view_label: "_PoP"
+    type: yesno
+    sql:  (EXTRACT(DAY FROM ${created_raw}) < EXTRACT(DAY FROM CURRENT_TIMESTAMP())
+                OR
+            (EXTRACT(DAY FROM ${created_raw}) = EXTRACT(DAY FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(HOUR FROM ${created_raw}) < EXTRACT(HOUR FROM CURRENT_TIMESTAMP()))
+                OR
+            (EXTRACT(DAY FROM ${created_raw}) = EXTRACT(DAY FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(HOUR FROM ${created_raw}) <= EXTRACT(HOUR FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(MINUTE FROM ${created_raw}) < EXTRACT(MINUTE FROM CURRENT_TIMESTAMP())))  ;;
+  }
+
+  dimension: ytd_only {
+    group_label: "To-Date Filters"
+    label: "YTD"
+    view_label: "_PoP"
+    type: yesno
+    #DOY = day of year in snowflake
+    sql:  (EXTRACT(DOY FROM ${created_raw}) < EXTRACT(DOY FROM CURRENT_TIMESTAMP())
+                OR
+            (EXTRACT(DOY FROM ${created_raw}) = EXTRACT(DOY FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(HOUR FROM ${created_raw}) < EXTRACT(HOUR FROM CURRENT_TIMESTAMP()))
+                OR
+            (EXTRACT(DOY FROM ${created_raw}) = EXTRACT(DOY FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(HOUR FROM ${created_raw}) <= EXTRACT(HOUR FROM CURRENT_TIMESTAMP()) AND
+            EXTRACT(MINUTE FROM ${created_raw}) < EXTRACT(MINUTE FROM CURRENT_TIMESTAMP())))  ;;
+  }
+
+  measure: count_pop {
+    label: "Count of order_items"
+    type: count
+    hidden: yes
+  }
+
+  measure: count_orders {
+    label: "Count of orders"
+    type: count_distinct
+    sql: ${order_id} ;;
+    hidden: yes
+  }
+
+  measure: total_sale_price_pop {
+    label: "Total Sales"
+    view_label: "_PoP"
+    type: sum
+    sql: ${sale_price} ;;
+    value_format_name: usd
+    drill_fields: [created_date]
+  }
+
+
+
   # ----- Sets of fields for drilling ------
   set: detail {
     fields: [
