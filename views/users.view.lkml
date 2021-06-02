@@ -51,6 +51,12 @@ view: users {
     # map_layer_name: us_municipalities
   }
 
+  dimension: city_case_when {
+    type: string
+    sql: case when ${country}='UK' then 'UK' else ${TABLE}."CITY" end;;
+    # map_layer_name: us_municipalities
+  }
+
   dimension: country {
     type: string
     map_layer_name: countries
