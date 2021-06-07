@@ -3,6 +3,17 @@ view: events {
     ;;
   drill_fields: [id]
 
+
+  filter: templated_filter {
+    type: string
+    # suggest_dimension: events.state
+    sql:
+      {% condition templated_filter %} ${events.state} {% endcondition %}
+      OR
+      {% condition templated_filter %} ${users.state} {% endcondition %}
+      ;;
+  }
+
   dimension: id {
     primary_key: yes
     type: number
@@ -17,6 +28,11 @@ view: events {
   dimension: city {
     type: string
     sql: ${TABLE}."CITY" ;;
+  }
+
+  dimension: city_case_when {
+    type: string
+    sql: case when ${country}='UK' then 'UK' else ${TABLE}."CITY" end ;;
   }
 
   dimension: country {

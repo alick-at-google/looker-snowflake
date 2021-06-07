@@ -11,7 +11,6 @@ view: order_items {
 parameter: data_as_of {
   type:  date
 }
-#comment
 
 parameter: number_selection {
   group_label: "parameterizing date dimension"
@@ -336,6 +335,21 @@ dimension: parameterized_date_field_yesno {
     sql: ${TABLE}."CREATED_AT" ;;
   }
 
+  dimension_group: created_test {
+    type: time
+    timeframes: [
+      date, time_of_day,
+      hour_of_day
+    ]
+    sql: ${TABLE}."CREATED_AT" ;;
+  }
+
+  dimension: time_of_day_number {
+    type: number
+    sql: to_number(${created_test_time_of_day}) ;;
+    # value_format_name: decimal_2
+  }
+
   dimension: year {
     # type: string
     type: number
@@ -561,7 +575,7 @@ dimension: parameterized_date_field_yesno {
 
   dimension: user_id {
     type: number
-    hidden: yes
+    # hidden: yes
     sql: ${TABLE}."USER_ID" ;;
   }
 
