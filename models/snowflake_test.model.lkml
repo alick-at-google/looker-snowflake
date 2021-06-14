@@ -18,6 +18,7 @@ explore: etl_jobs {}
 explore: pagination_test {}
 
 explore: events {
+  fields: [ALL_FIELDS*, -users.state_with_order_by_field]
   join: users {
     type: left_outer
     sql_on: ${events.user_id} = ${users.id} ;;
@@ -40,6 +41,7 @@ explore: inventory_items {
 }
 
 explore: order_items {
+  fields: [ALL_FIELDS*, -users.state_with_order_by_field]
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
@@ -94,4 +96,10 @@ explore: products {
 
 explore: rank3 {}
 
-explore: users {}
+explore: users {
+  join: users_dt {
+    type: left_outer
+    sql_on: ${users.state} = ${users_dt.users_state} ;;
+    relationship: many_to_one
+  }
+}

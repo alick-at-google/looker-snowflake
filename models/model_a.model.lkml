@@ -10,7 +10,7 @@ include: "/**/map_layers.lkml"
 # # and define the joins that connect them together.
 #
 explore: order_items {
-  fields: [ALL_FIELDS*, -order_items.sale_price_with_negatives]
+  fields: [ALL_FIELDS*, -order_items.sale_price_with_negatives, -users.state_with_order_by_field]
   join: users {
     relationship: many_to_one
     sql_on: ${users.id} = ${order_items.user_id} ;;
