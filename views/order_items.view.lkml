@@ -17,6 +17,68 @@ parameter: number_selection {
   type: number
 }
 
+###########################################
+parameter: last_x_days_number {
+  type: unquoted
+    allowed_value: { label: "7 Days" value: "7" }
+    allowed_value: { label: "30 Days" value: "30" }
+  }
+
+  parameter: last_x_days {
+    type: date
+    allowed_value: { label: "7 Days" value: "2021/06/04 for 7 days" }
+    allowed_value: { label: "30 Days" value: "2021/05/11 for 30 days" }
+  }
+
+  dimension: last_x_days_yesno {
+    type: yesno
+    sql: {% condition last_x_days %} ${created_date} {% endcondition %} ;;
+  }
+
+  measure: average_sale_price_of_last_x_days{
+    type: average
+    sql: ${sale_price} ;;
+    filters: [last_x_days_yesno: "yes"]
+    value_format_name: decimal_2
+  }
+
+dimension: last_x_days_input {
+  type: string
+  hidden: yes
+  sql:
+  {% if last_x_days._parameter_value == '7' %}
+  '2021/06/04 for 7 days'
+  {% elsif last_x_days._parameter_value == '30' %}
+  '2021/05/11 for 30 days'
+  {% else %}
+  null
+  {% endif %};;
+}
+
+measure: last_7_days {
+  type: count
+  filters: [created_date: "2021/06/04 for 7 days"]
+}
+
+measure: last_30_days {
+  type: count
+  filters: [created_date: "2021/05/11 for 30 days"]
+}
+
+
+measure: avg_of_last_x_days {
+  type: number
+  sql:
+  {% if last_x_days._parameter_value == '7' %}
+      ${last_7_days}/{{ last_x_days._parameter_value }}
+    {% else %}
+      ${last_30_days}/{{ last_x_days._parameter_value }}
+    {% endif %} ;;
+  value_format_name: decimal_3
+}
+##########################################
+
+
 parameter: timeframe_selection {
   group_label: "parameterizing date dimension"
   type: string
@@ -72,8 +134,11 @@ dimension: parameterized_date_field_yesno {
 }
 
   filter: date_filter_1 {
-    type: date_time
-    default_value: "today"
+    type: date
+    # default_value: "today"
+    # default_value: "35 months ago for 1 month"
+    sql: {% condition date_filter_1 %} ${created_date} {% endcondition %} ;;
+    # suggest_dimension: created_month
   }
 
   filter: number {
@@ -82,6 +147,12 @@ dimension: parameterized_date_field_yesno {
 
   filter: number_as_string {
     type: string
+  }
+
+  filter: string_filter_with_sql_and_suggest_dim {
+    type: string
+    sql: concat({% condition date_filter_1 %} ${created_date_month} {% endcondition %}, '-01') ;;
+    suggest_dimension: created_date_month
   }
 
   parameter: number_parameter {
@@ -156,6 +227,8 @@ dimension: parameterized_date_field_yesno {
   }
 
   dimension_group: current {
+    group_label: "Now"
+    label: "Now"
     type: time
     timeframes: [date, week, day_of_week_index, day_of_week]
     sql: current_date() ;;
@@ -174,6 +247,11 @@ dimension: parameterized_date_field_yesno {
     sql: ${sale_price};;
     value_format_name: usd_0
     filters: [created_year: "2020"]
+  }
+
+  measure: status_list {
+    type: list
+    list_field: status
   }
 
   ###### HTML IMAGES ###########
@@ -335,6 +413,11 @@ dimension: parameterized_date_field_yesno {
     sql: ${TABLE}."CREATED_AT" ;;
   }
 
+  dimension: created_date_month {
+    type: string
+    sql: to_char(${created_month}) ;;
+  }
+
   dimension_group: created_test {
     type: time
     timeframes: [
@@ -424,15 +507,6 @@ dimension: parameterized_date_field_yesno {
 
 ###########. End test
 
-
-  dimension: date {
-  description: "delivered date"
-   type: date
-    sql: {% condition date_filter_1 %} to_timestamp(${delivered_raw}) {% endcondition %}  ;;
-    # sql:${TABLE}."CREATED_AT";;
-    # required_fields: [order_items.year,order_items.week_of_year]
-  }
-
   dimension_group: delivered {
     type: time
     timeframes: [
@@ -490,6 +564,7 @@ dimension: parameterized_date_field_yesno {
   dimension: sale_price {
     type: number
     sql: ${TABLE}."SALE_PRICE" ;;
+    html: <b>{{value}}<b> <br> {{value}};;
   }
 
   #########
@@ -545,6 +620,7 @@ dimension: parameterized_date_field_yesno {
   dimension: status {
     type: string
     sql: ${TABLE}."STATUS" ;;
+    # html: <b>{{value}}<b> <br> {{value}};;
 #     html: <div class="btn-group btn-group-toggle" data-toggle="buttons">
 # <label class="btn btn-secondary active">
 # <input type="radio" name="options" id="option1" autocomplete="off" checked>
@@ -695,7 +771,7 @@ dimension: parameterized_date_field_yesno {
     type: count_distinct
     sql: ${order_id} ;;
     value_format_name: usd_0
-    html: €{{ value | round }} ;;
+    html: <b> €{{ value | round }} </b> ;;
   }
 
   dimension: date_html {
@@ -778,7 +854,17 @@ parameter: year_selector {
       label: "Drill with totals and row totals"
       url: "{{ dummy_2._link }}&pivots=order_items.created_month&total=on&row_total=right"
     }
-  }
+
+    link: {
+      label: "Monthly Trend"
+      url: "
+      {% assign vis_config = '{
+      \"type\" : \"looker_line\",
+      \"x_axis_label\" : \"Month\"
+      }' %}
+      {{ dummy_2._link }}&fields=count_orders_2020,created_month&vis_config={{ vis_config | encode_uri }}&limit=20"
+    }
+    }
 
   measure: dummy_2 {
     type: number

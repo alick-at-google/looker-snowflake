@@ -43,7 +43,8 @@ explore: tiers_on_measure {
 }
 
 explore: order_items {
-
+# view_label: ""
+fields: [ALL_FIELDS*, -users.state_with_order_by_field]
 
   # always_filter: {
   #   filters: [order_items.created_date: "last 7 days", order_items.status: "Returned"]
@@ -70,6 +71,7 @@ explore: order_items {
 
 
   join: users {
+    view_label: ""
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
     relationship: many_to_one
@@ -154,7 +156,7 @@ explore: products {
 
 explore: inventory_items {
   symmetric_aggregates: no
-  fields: [ALL_FIELDS*, -order_items.sale_price_with_negatives]
+  fields: [ALL_FIELDS*, -order_items.sale_price_with_negatives, -users.state_with_order_by_field]
   join: order_items {
     type: left_outer
     # relationship: many_to_one

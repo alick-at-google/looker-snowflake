@@ -48,6 +48,7 @@ view: users {
   dimension: city {
     type: string
     sql: ${TABLE}."CITY" ;;
+    # html:  <p style="color: black; background-color: lightblue; font-size:100%; text-align:center">{{ rendered_value }}</p> ;;
     # map_layer_name: us_municipalities
   }
 
@@ -148,7 +149,7 @@ view: users {
   dimension: full_name {
     type: string
     sql: concat(${first_name}, ' ', ${last_name}) ;;
-    html: {{first_name._value}}<br>{{last_name._rendered_value}} ;;
+    # html: {{first_name._value}}<br>{{last_name._rendered_value}} ;;
     required_fields: [state]
   }
 
@@ -165,6 +166,28 @@ view: users {
   dimension: state {
     type: string
     sql: ${TABLE}."STATE" ;;
+  }
+
+  dimension: state_with_order_by_field {
+      type: string
+      sql: ${TABLE}."STATE" ;;
+      order_by_field: users_dt.users_count
+    }
+
+  dimension: is_usa {
+    type: yesno
+    sql: ${country} = 'USA' ;;
+  }
+
+  dimension: test {
+    type: string
+    sql: case when ${is_usa} then 'USA' else ${city} end;;
+    html: {% if value == 'USA' %}
+    {{ value }}
+    {% else %}
+    <p style="color: black; background-color: lightblue; font-size:100%; text-align:center">{{ rendered_value }}</p>
+    {% endif %}
+    ;;
   }
 
   dimension: city_comma_state {
