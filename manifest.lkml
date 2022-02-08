@@ -1,9 +1,9 @@
 project_name: "snowflake_test"
 
-constant: schema_test {
-  value: "{% if 1==0 %} test {% else %} test2 {% endif %}"
-  export: override_optional
-}
+# constant: schema_test {
+#   value: "{% if 1==0 %} test {% else %} test2 {% endif %}"
+#   export: override_optional
+# }
 
 constant: schema_test {
   value: "{% if _user_attributes['email'] == 'danielle.behette@looker.com' %}PUBLIC
