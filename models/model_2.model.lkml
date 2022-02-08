@@ -71,7 +71,6 @@ fields: [ALL_FIELDS*, -users.state_with_order_by_field]
 
 
   join: users {
-    view_label: ""
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
     relationship: many_to_one

@@ -1,4 +1,36 @@
-# project_name: "snowflake_test"
+project_name: "snowflake_test"
+
+constant: schema_test {
+  value: "{% if 1==0 %} test {% else %} test2 {% endif %}"
+  export: override_optional
+}
+
+constant: schema_test {
+  value: "{% if _user_attributes['email'] == 'danielle.behette@looker.com' %}PUBLIC
+  {% else %}
+  schema
+  {% endif %}"
+}
+
+constant: schema_test_2 {
+  value:
+  "{% assign user_name = _user_attributes['first_name'] %}
+  {% if user_name == 'Danielle' %}
+  PUBLIC
+  {% else %}
+  schema
+  {% endif %}"
+}
+
+
+
+# {% assign user_can_view_pii = _user_attributes["can_view_pii"]|upcase %}
+# {% if user_can_view_pii == "FALSE" %}
+# {% assign schema = {{_user_attributes['schema_name']|upcase}}"_NON_PII" %}
+# {% else %}
+# {% assign schema = {{_user_attributes['schema_name']|upcase}} %}
+# {% endif %}
+# "{{schema}}"."DIM_CRISIS_VOTES"
 
 # constant: schema_name {
 #   value: "schema_1"

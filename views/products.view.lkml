@@ -1,6 +1,7 @@
 view: products {
-  sql_table_name: "PUBLIC"."PRODUCTS";;
+  # sql_table_name: "PUBLIC"."PRODUCTS";;
   # sql_table_name: "PUBLIC".{% parameter category_param %}_table ;;
+  sql_table_name: @{schema_test_2}."PRODUCTS" ;;
   drill_fields: [id]
 
 
@@ -13,6 +14,11 @@ view: products {
     primary_key: yes
     type: number
     sql: ${TABLE}."ID" ;;
+  }
+
+  filter: year_selector_filter {
+    type: string
+    suggest_dimension: order_items.created_year
   }
 
   dimension: html_test {
@@ -239,6 +245,25 @@ view: products {
   measure: total_of_counts {
     type: number
     sql: ${count_category_not_null}+${count_department_not_null} ;;
+  }
+
+  measure: dividing_filtered_count_distincts  {
+    type: number
+    sql: ${count_department_not_null}/${count_category_not_null} ;;
+  }
+
+  measure: dividing_with_subquery {
+    type:  number
+    sql:  (SELECT COUNT(DISTINCT ${id}) FROM ${TABLE} WHERE ${department} = 'Men')
+    /
+    (SELECT COUNT(DISTINCT ${id}) FROM ${TABLE}) ;;
+  }
+
+  measure: dividing_with_case_when {
+    type:  number
+    sql:  COUNT(DISTINCT CASE WHEN ${department} = 'Men' THEN ${id})
+          /
+          COUNT(DISTINCT ${id}) ;;
   }
 
   measure: total_of_counts_2 {
