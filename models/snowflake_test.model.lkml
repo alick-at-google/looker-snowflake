@@ -84,6 +84,13 @@ explore: order_items {
     sql_on: ${order_items.created_date} = ${previous_day_with_lead_function_dt.date} ;;
     relationship: many_to_one
   }
+
+  join: title_count {
+    type: left_outer
+    sql_on: ${order_items.user_id} = ${title_count.order_items_user_id} ;;
+    relationship: many_to_one
+  }
+
 }
 
 explore: products {
