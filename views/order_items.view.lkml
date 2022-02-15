@@ -26,21 +26,33 @@ parameter: last_x_days_number {
 
   parameter: last_x_days {
     type: date
+    # default_value: "today"
     allowed_value: { label: "7 Days" value: "2021/06/04 for 7 days" }
     allowed_value: { label: "30 Days" value: "2021/05/11 for 30 days" }
   }
 
-  dimension: last_x_days_yesno {
-    type: yesno
-    sql: {% condition last_x_days %} ${created_date} {% endcondition %} ;;
+  # filter: last_x_days_filter {
+  #   type: date
+  #   default_value: "today"
+  # }
+
+  dimension: last_x_days_date {
+    type: date
+    sql: {{ last_x_days._parameter_value }} ;;
+    # sql: {% condition last_x_days_filter %} ${created_date} {% endcondition %} ;;
   }
 
-  measure: average_sale_price_of_last_x_days{
-    type: average
-    sql: ${sale_price} ;;
-    filters: [last_x_days_yesno: "yes"]
-    value_format_name: decimal_2
-  }
+  # dimension: last_x_days_yesno {
+  #   type: yesno
+  #   sql: {% condition last_x_days_filter %} ${created_date} {% endcondition %} ;;
+  # }
+
+  # measure: average_sale_price_of_last_x_days{
+  #   type: average
+  #   sql: ${sale_price} ;;
+  #   filters: [last_x_days_yesno: "yes"]
+  #   value_format_name: decimal_2
+  # }
 
 dimension: last_x_days_input {
   type: string
