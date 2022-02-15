@@ -267,7 +267,7 @@ view: users {
   measure: count {
     type: count
     drill_fields: [id, first_name, last_name, events.count, order_items.count]
-    value_format_name: decimal_0
+    value_format_name: decimal_2
     # html: {{ state._rendered_value }}: {{ rendered_value }} ;;
   }
 
